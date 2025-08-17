@@ -126,17 +126,17 @@ class CompleteWorkflowSuperScraper:
                     results['linkedin_employees'] = verified_contacts
                     results['verified_contacts'] = verified_contacts
                 else:
-                    print("⚠️ LinkedIn pipeline found no contacts - trying fallback...")
-                    verified_contacts = self._run_fallback_pipeline(website_url, results)
+                    print("⚠️ LinkedIn pipeline found no contacts - trying smart fallback...")
+                    verified_contacts = self._run_smart_fallback_pipeline(results)
                     
             else:
-                print(f"\n🛡️ PART 2: WEBSITE FALLBACK PIPELINE")
+                print(f"\n🛡️ PART 2: SMART FALLBACK PIPELINE")
                 print("-" * 50)
-                print(f"❌ No LinkedIn URL found - activating bulletproof fallback")
-                print(f"🎯 Strategy: Direct website contact extraction")
+                print(f"❌ No LinkedIn URL found - using pre-captured fallback data")
+                print(f"🎯 Strategy: Use contact data already captured in Part 1")
                 
-                results['workflow_path'] = 'fallback_pipeline'
-                verified_contacts = self._run_fallback_pipeline(website_url, results)
+                results['workflow_path'] = 'smart_fallback_pipeline'
+                verified_contacts = self._run_smart_fallback_pipeline(results)
             
             if not verified_contacts:
                 print("❌ No verified email addresses found in any pipeline")
@@ -164,14 +164,15 @@ class CompleteWorkflowSuperScraper:
             results['error'] = str(e)
             return results
 
-    def _run_fallback_pipeline(self, website_url: str, results: dict) -> list:
-        """🛡️ Run the bulletproof fallback pipeline"""
+    def _run_smart_fallback_pipeline(self, results: dict) -> list:
+        """🛡️ Run the smart fallback pipeline using pre-captured data"""
         
-        fallback_contacts = self.website_scraper.website_fallback_pipeline(website_url)
+        # Use the pre-captured data from Part 1 - no re-scraping!
+        fallback_contacts = self.website_scraper.get_fallback_contacts()
         results['fallback_contacts'] = fallback_contacts
         
         if fallback_contacts:
-            print(f"🎉 Fallback pipeline successful: {len(fallback_contacts)} contacts found")
+            print(f"🎉 Smart fallback successful: {len(fallback_contacts)} contacts from pre-captured data")
             
             # Take top contacts based on fire protection score
             top_contacts = sorted(fallback_contacts, 
@@ -183,11 +184,12 @@ class CompleteWorkflowSuperScraper:
                 name = contact.get('name', 'Unknown')
                 score = contact.get('fire_protection_score', 0)
                 email = contact.get('email', 'No email')
-                print(f"   {i}. {name} - Score: {score} - Email: {email}")
+                source = contact.get('email_source', 'unknown')
+                print(f"   {i}. {name} - Score: {score} - Email: {email} - Source: {source}")
             
             return top_contacts
         else:
-            print("❌ Fallback pipeline also failed to find contacts")
+            print("❌ Smart fallback pipeline found no contacts in pre-captured data")
             return []
 
     def _generate_and_send_emails(self, verified_contacts: list, domain: str) -> list:
@@ -360,14 +362,14 @@ def main():
                        help="Credit threshold for account switching (default: $4.85)")
     args = parser.parse_args()
 
-    print("🚀 COMPLETE WORKFLOW SUPER SCRAPER - BULLETPROOF VERSION")
+    print("🚀 COMPLETE WORKFLOW SUPER SCRAPER - SMART FALLBACK VERSION")
     print("=" * 70)
-    print("🔄 Website → Staff → LinkedIn OR Website Fallback → Patterns → AI → Send")
+    print("🔄 Website → Staff → LinkedIn OR Smart Fallback → Patterns → AI → Send")
     print(f"🧠 Features: Enhanced content analysis + Smart pattern learning")
-    print(f"🛡️ NEW: Bulletproof fallback for websites without LinkedIn")
+    print(f"🛡️ SMART: Uses pre-captured data - no re-scraping needed!")
     print(f"📧 Test mode: All emails go to dave@alpha-omegaltd.com")
     print(f"💰 Credit threshold: ${args.credit_threshold}")
-    print(f"🔥 BULLETPROOF: Works even if LinkedIn URL not found!")
+    print(f"🔥 EFFICIENT: Captures all data once in Part 1!")
     print()
 
     # Check environment variables
@@ -397,7 +399,7 @@ def main():
         results_file = scraper.save_results(results)
         
         # Final summary
-        print("\n🎉 BULLETPROOF WORKFLOW SUMMARY")
+        print("\n🎉 SMART FALLBACK WORKFLOW SUMMARY")
         print("=" * 60)
         print(f"🌐 Website: {results['website_url']}")
         print(f"👥 Website staff found: {len(results['website_staff'])}")
@@ -416,7 +418,7 @@ def main():
         print()
         
         if results['status'] == 'completed':
-            print("✅ Bulletproof workflow successful!")
+            print("✅ Smart fallback workflow successful!")
             
             if results['emails_sent']:
                 print("\n🎯 Fire Protection Targets Contacted:")
