@@ -1,7 +1,7 @@
 """
-🌐 Enhanced Website Scraper Module
-===================================
-Handles website scraping with bulletproof fallback systems
+🌐 Smart Website Scraper Module
+==============================
+Captures ALL useful data in Part 1 - no re-scraping needed!
 """
 
 import json
@@ -11,18 +11,27 @@ from account_manager import get_working_apify_client_part1
 
 
 class WebsiteScraper:
-    """🌐 Website scraping with GPT-4o analysis and bulletproof fallbacks"""
+    """🌐 Smart website scraping - capture everything once in Part 1"""
     
     def __init__(self, openai_key):
         self.openai_key = openai_key
+        # Store fallback data from Part 1
+        self.fallback_contact_data = {
+            'emails_found': [],
+            'contact_info': [],
+            'all_content': '',
+            'domain': ''
+        }
     
     def scrape_website_for_staff_and_linkedin(self, website_url: str) -> tuple:
-        """📋 Main method: Scrape website for staff and LinkedIn URL using account rotation"""
+        """📋 SMART: Scrape website once and capture ALL useful data for later use"""
         
         print(f"🗺️ Phase 1a: Website mapping...")
         
-        # Normalize URL
+        # Normalize URL and extract domain
         normalized_url = self._normalize_www(website_url)
+        domain = urlparse(website_url).netloc.replace('www.', '')
+        self.fallback_contact_data['domain'] = domain
         
         # Map website to find URLs using account rotation
         website_map = self._stealth_website_mapping(normalized_url)
@@ -40,10 +49,10 @@ class WebsiteScraper:
             print("❌ No URLs selected for analysis")
             return [], ""
         
-        print(f"🔍 Phase 1c: Content analysis...")
+        print(f"🔍 Phase 1c: SMART content analysis - capturing ALL data...")
         
-        # Extract staff and LinkedIn from selected URLs using account rotation
-        staff_list, social_data = self._extract_staff_and_social(selected_urls)
+        # 🧠 SMART: Extract staff, LinkedIn, AND capture fallback data
+        staff_list, social_data = self._extract_staff_and_capture_fallback_data(selected_urls, domain)
         
         # Find LinkedIn URL
         linkedin_url = (social_data.get('company_linkedin') or 
@@ -53,165 +62,140 @@ class WebsiteScraper:
         print(f"✅ Website scraping complete:")
         print(f"   👥 Staff found: {len(staff_list)}")
         print(f"   🔗 LinkedIn URL: {linkedin_url[:50]}..." if linkedin_url else "   ❌ No LinkedIn URL found")
+        print(f"   📧 Fallback emails captured: {len(self.fallback_contact_data['emails_found'])}")
+        print(f"   👤 Fallback contacts captured: {len(self.fallback_contact_data['contact_info'])}")
+        print(f"   💾 Fallback data ready for later use if needed")
         
         return staff_list, linkedin_url
 
-    def website_fallback_pipeline(self, website_url: str) -> list:
-        """🛡️ BULLETPROOF FALLBACK: Extract contacts when LinkedIn fails"""
+    def get_fallback_contacts(self) -> list:
+        """🛡️ Return pre-captured fallback contact data (no re-scraping needed!)"""
         
-        print("\n🛡️ WEBSITE FALLBACK PIPELINE ACTIVATED")
-        print("🎯 Target: Extract all possible contact information from website")
-        print("🔧 Strategy: Deep content analysis + Email discovery + GPT-4o-mini contact identification")
-        print("=" * 80)
+        print("\n🛡️ USING PRE-CAPTURED FALLBACK DATA")
+        print("🎯 Strategy: Use contact data already captured in Part 1")
+        print("✅ No re-scraping needed - data already available!")
+        print("=" * 70)
         
-        try:
-            # Step 1: Deep website scraping
-            print("🔍 STEP 1: DEEP WEBSITE CONTENT EXTRACTION")
-            all_content, all_social = self._deep_website_scraping(website_url)
-            
-            if not all_content:
-                print("❌ No content extracted from website")
-                return []
-            
-            # Step 2: Extract emails directly from content
-            print("\n📧 STEP 2: DIRECT EMAIL EXTRACTION FROM CONTENT")
-            found_emails = self._extract_emails_from_content(all_content)
-            
-            # Step 3: Extract contact information 
-            print("\n👥 STEP 3: CONTACT INFORMATION EXTRACTION")
-            contact_info = self._extract_contact_info_gpt(all_content, website_url)
-            
-            # Step 4: Generate potential emails for found contacts
-            print("\n🧪 STEP 4: EMAIL GENERATION FOR DISCOVERED CONTACTS")
-            domain = urlparse(website_url).netloc.replace('www.', '')
-            discovered_contacts = self._generate_emails_for_contacts(contact_info, found_emails, domain)
-            
-            # Step 5: Fire protection scoring for website contacts
-            print("\n🔥 STEP 5: FIRE PROTECTION SCORING FOR WEBSITE CONTACTS")
-            scored_contacts = self._score_website_contacts_fire_protection(discovered_contacts)
-            
-            print(f"\n📊 WEBSITE FALLBACK RESULTS:")
-            print(f"   📧 Direct emails found: {len(found_emails)}")
-            print(f"   👥 Contacts discovered: {len(contact_info)}")
-            print(f"   ✅ Total verified contacts: {len(scored_contacts)}")
-            
-            return scored_contacts
-            
-        except Exception as e:
-            print(f"❌ Website fallback pipeline failed: {e}")
-            import traceback
-            traceback.print_exc()
+        domain = self.fallback_contact_data['domain']
+        emails_found = self.fallback_contact_data['emails_found']
+        contact_info = self.fallback_contact_data['contact_info']
+        
+        if not emails_found and not contact_info:
+            print("❌ No fallback contact data available")
             return []
+        
+        print(f"📧 Using {len(emails_found)} pre-captured emails")
+        print(f"👤 Using {len(contact_info)} pre-captured contacts")
+        
+        # Generate emails for discovered contacts using pre-captured data
+        discovered_contacts = self._generate_emails_for_captured_contacts(
+            contact_info, emails_found, domain
+        )
+        
+        # Score contacts for fire protection relevance
+        scored_contacts = self._score_website_contacts_fire_protection(discovered_contacts)
+        
+        print(f"\n📊 FALLBACK RESULTS FROM PRE-CAPTURED DATA:")
+        print(f"   📧 Direct emails: {len(emails_found)}")
+        print(f"   👥 Named contacts: {len(contact_info)}")
+        print(f"   ✅ Total verified contacts: {len(scored_contacts)}")
+        
+        return scored_contacts
 
-    def _deep_website_scraping(self, website_url: str) -> tuple:
-        """🔍 Deep scraping of entire website for maximum content extraction"""
+    def _extract_staff_and_capture_fallback_data(self, urls: list, domain: str) -> tuple:
+        """🧠 SMART: Extract staff AND capture all contact data for later fallback use"""
         
-        # Normalize URL
-        normalized_url = self._normalize_www(website_url)
-        
-        # Get comprehensive website map
-        website_map = self._comprehensive_website_mapping(normalized_url)
-        
-        if not website_map:
-            print("❌ Comprehensive website mapping failed")
-            return "", {}
-        
-        # Get ALL relevant URLs (not just 3)
-        all_relevant_urls = self._get_all_relevant_urls(website_map, normalized_url)
-        
-        print(f"🔍 Found {len(all_relevant_urls)} relevant URLs to analyze")
-        
-        # Extract content from ALL relevant pages
-        all_content = ""
+        all_staff = []
         all_social = {}
+        all_content_combined = ""
         
-        for i, url in enumerate(all_relevant_urls[:10], 1):  # Limit to top 10 to avoid excessive costs
-            print(f"  📄 Deep scraping {i}/{min(len(all_relevant_urls), 10)}: {url}")
+        for i, url in enumerate(urls, 1):
+            print(f"  📄 Processing {i}/{len(urls)}: {url}")
             
             try:
-                content, social = self._analyze_single_url(url)
+                staff, social, content = self._analyze_single_url_with_content_capture(url)
+                all_staff.extend(staff)
+                all_social.update(social)
+                
+                # 🧠 SMART: Accumulate ALL content for fallback analysis
                 if content:
-                    all_content += f"\n\n=== CONTENT FROM {url} ===\n{content}"
-                    all_social.update(social)
-                    print(f"    ✅ Extracted {len(content)} characters")
-                else:
-                    print(f"    ⚠️ No content extracted")
+                    all_content_combined += f"\n\n=== CONTENT FROM {url} ===\n{content}"
+                
+                if staff:
+                    print(f"    ✅ Found {len(staff)} staff members")
                 
             except Exception as e:
-                print(f"    ❌ Error: {e}")
+                print(f"    ⚠️ Error: {e}")
         
-        return all_content, all_social
+        # 🧠 SMART: Now analyze ALL captured content for fallback contacts
+        print(f"\n🧠 SMART ANALYSIS: Extracting fallback data from {len(all_content_combined)} characters")
+        self.fallback_contact_data['all_content'] = all_content_combined
+        
+        # Extract emails from all content
+        emails_found = self._extract_emails_from_content(all_content_combined)
+        self.fallback_contact_data['emails_found'] = emails_found
+        
+        # Extract contact information using GPT-4o-mini
+        contact_info = self._extract_contact_info_gpt(all_content_combined, domain)
+        self.fallback_contact_data['contact_info'] = contact_info
+        
+        print(f"✅ SMART CAPTURE COMPLETE:")
+        print(f"   📧 Emails captured for fallback: {len(emails_found)}")
+        print(f"   👤 Contacts captured for fallback: {len(contact_info)}")
+        
+        return all_staff, all_social
 
-    def _comprehensive_website_mapping(self, url: str) -> dict:
-        """🗺️ Comprehensive website mapping to find ALL pages"""
+    def _analyze_single_url_with_content_capture(self, url: str) -> tuple:
+        """🔍 Analyze single URL and return content for fallback analysis"""
         
-        mapping_function = """
-async function pageFunction(context) {
-    const { request, log, jQuery } = context;
-    const $ = jQuery;
-    
-    await context.waitFor(8000);
-    
-    try {
-        const allLinks = [];
-        const socialMedia = {};
-        
-        // Get all links
-        $('a[href]').each(function() {
-            const href = $(this).attr('href');
-            const text = $(this).text().trim();
+        # JavaScript function that captures MORE content
+        page_function = """
+        async function pageFunction(context) {
+            const { request, log, jQuery } = context;
+            const $ = jQuery;
             
-            if (href && href.length > 1) {
-                let fullUrl = href;
-                if (href.startsWith('/')) {
-                    const baseUrl = request.url.split('/').slice(0, 3).join('/');
-                    fullUrl = baseUrl + href;
-                }
+            await context.waitFor(8000);
+            
+            try {
+                const bodyText = $('body').text() || '';
+                const socialMedia = {};
                 
-                allLinks.push({
-                    url: fullUrl,
-                    text: text,
-                    href: href
+                $('a[href]').each(function() {
+                    const href = $(this).attr('href');
+                    if (!href) return;
+                    
+                    const lowerHref = href.toLowerCase();
+                    if (lowerHref.includes('linkedin.com') && !socialMedia.linkedin) {
+                        socialMedia.linkedin = href;
+                    } else if (lowerHref.includes('facebook.com') && !socialMedia.facebook) {
+                        socialMedia.facebook = href;
+                    } else if (lowerHref.includes('twitter.com') && !socialMedia.twitter) {
+                        socialMedia.twitter = href;
+                    } else if (lowerHref.includes('instagram.com') && !socialMedia.instagram) {
+                        socialMedia.instagram = href;
+                    }
                 });
                 
-                // Check for social media
-                const lowerHref = href.toLowerCase();
-                if (lowerHref.includes('linkedin.com') && !socialMedia.linkedin) {
-                    socialMedia.linkedin = href;
-                } else if (lowerHref.includes('facebook.com') && !socialMedia.facebook) {
-                    socialMedia.facebook = href;
-                } else if (lowerHref.includes('twitter.com') && !socialMedia.twitter) {
-                    socialMedia.twitter = href;
-                }
+                return {
+                    url: request.url,
+                    content: bodyText,
+                    socialMedia: socialMedia
+                };
+                
+            } catch (error) {
+                return {
+                    url: request.url,
+                    content: '',
+                    socialMedia: {}
+                };
             }
-        });
-        
-        // Get all text content for email extraction
-        const bodyText = $('body').text() || '';
-        
-        return {
-            url: request.url,
-            websiteMap: {
-                allLinks: allLinks,
-                domain: request.url.split('/')[2],
-                socialMedia: socialMedia,
-                bodyText: bodyText
-            }
-        };
-        
-    } catch (error) {
-        return {
-            url: request.url,
-            websiteMap: { allLinks: [], domain: request.url.split('/')[2], socialMedia: {}, bodyText: '' }
-        };
-    }
-}
-"""
+        }
+        """
         
         payload = {
             "startUrls": [{"url": url}],
             "maxPagesPerRun": 1,
-            "pageFunction": mapping_function,
+            "pageFunction": page_function,
             "proxyConfiguration": {"useApifyProxy": True}
         }
         
@@ -222,84 +206,28 @@ async function pageFunction(context) {
             if run:
                 items = client.dataset(run["defaultDatasetId"]).list_items().items
                 if items:
-                    return items[0].get('websiteMap', {})
+                    content = items[0].get('content', '')
+                    social = items[0].get('socialMedia', {})
+                    
+                    # Analyze content with GPT-4o for staff
+                    staff = self._gpt_extract_staff(content, url)
+                    
+                    # 🧠 SMART: Return content for fallback analysis
+                    return staff, social, content
             
-            return {}
+            return [], {}, ""
             
         except Exception as e:
-            print(f"❌ Comprehensive website mapping failed: {e}")
-            return {}
-
-    def _get_all_relevant_urls(self, website_map: dict, domain: str) -> list:
-        """🎯 Get ALL URLs that might contain contact information"""
-        
-        all_links = website_map.get('allLinks', [])
-        
-        # Relevant keywords for contact pages
-        contact_keywords = [
-            'about', 'team', 'staff', 'people', 'contact', 'leadership', 'management',
-            'directors', 'employees', 'our-team', 'meet-the-team', 'who-we-are',
-            'company', 'services', 'work', 'careers', 'jobs', 'expertise'
-        ]
-        
-        relevant_urls = []
-        base_domain = urlparse(domain).netloc
-        
-        for link in all_links:
-            url = link.get('url', '').lower()
-            text = link.get('text', '').lower()
-            href = link.get('href', '').lower()
-            
-            # Include main domain links that might have contact info
-            if base_domain in url:
-                # Check if URL or link text contains relevant keywords
-                if any(keyword in url or keyword in text or keyword in href for keyword in contact_keywords):
-                    full_url = link.get('url', '')
-                    if full_url not in [r.get('url') for r in relevant_urls]:
-                        relevant_urls.append({
-                            'url': full_url,
-                            'text': link.get('text', ''),
-                            'relevance': self._calculate_url_relevance(url, text, href)
-                        })
-        
-        # Sort by relevance score
-        relevant_urls.sort(key=lambda x: x['relevance'], reverse=True)
-        
-        # Add main page if not already included
-        main_url = domain.rstrip('/')
-        if not any(main_url == r['url'] for r in relevant_urls):
-            relevant_urls.insert(0, {'url': main_url, 'text': 'Homepage', 'relevance': 50})
-        
-        return [r['url'] for r in relevant_urls]
-
-    def _calculate_url_relevance(self, url: str, text: str, href: str) -> int:
-        """Calculate relevance score for contact information"""
-        score = 0
-        
-        # High priority keywords
-        high_priority = ['contact', 'about', 'team', 'staff', 'people']
-        for keyword in high_priority:
-            if keyword in url or keyword in text:
-                score += 20
-        
-        # Medium priority keywords  
-        medium_priority = ['leadership', 'management', 'directors', 'company']
-        for keyword in medium_priority:
-            if keyword in url or keyword in text:
-                score += 15
-        
-        # Lower priority keywords
-        low_priority = ['services', 'work', 'careers', 'expertise']
-        for keyword in low_priority:
-            if keyword in url or keyword in text:
-                score += 10
-        
-        return score
+            print(f"    ❌ Content analysis failed: {e}")
+            return [], {}, ""
 
     def _extract_emails_from_content(self, content: str) -> list:
         """📧 Extract email addresses directly from website content"""
         
-        print("🔍 Scanning content for email addresses...")
+        if not content:
+            return []
+        
+        print("🔍 Extracting emails from captured content...")
         
         # Email regex patterns
         email_patterns = [
@@ -322,7 +250,7 @@ async function pageFunction(context) {
                 email = email.strip().lower()
                 if self._is_valid_business_email(email):
                     found_emails.add(email)
-                    print(f"   📧 Found email: {email}")
+                    print(f"   📧 Captured email: {email}")
         
         return list(found_emails)
 
@@ -334,25 +262,18 @@ async function pageFunction(context) {
         if any(keyword in email.lower() for keyword in spam_keywords):
             return False
         
-        # Skip generic emails that aren't useful for business contact
-        generic_keywords = ['newsletter', 'marketing', 'sales@', 'support@', 'help@']
-        if any(keyword in email.lower() for keyword in generic_keywords):
-            return False
-        
         # Basic email format validation
         if '@' not in email or '.' not in email.split('@')[1]:
             return False
         
         return True
 
-    def _extract_contact_info_gpt(self, content: str, website_url: str) -> list:
+    def _extract_contact_info_gpt(self, content: str, domain: str) -> list:
         """🧠 Use GPT-4o-mini to extract contact information from website content"""
         
         if len(content) < 1000:
             print("⚠️ Insufficient content for GPT analysis")
             return []
-        
-        domain = urlparse(website_url).netloc.replace('www.', '')
         
         prompt = f"""Analyze this website content and extract ALL possible contact information for business decision-makers.
 
@@ -375,7 +296,7 @@ Return as JSON:
 [
   {{
     "name": "Full Name",
-    "title": "Job Title",
+    "title": "Job Title", 
     "phone": "Phone if found",
     "department": "Department if mentioned",
     "role_type": "owner/manager/director/staff",
@@ -386,7 +307,7 @@ Return as JSON:
 If no contacts found: []
 
 CONTENT:
-{content[:150000]}"""  # Increased content limit for better analysis
+{content[:150000]}"""  # Use substantial content for analysis
 
         try:
             from openai import OpenAI
@@ -414,7 +335,7 @@ CONTENT:
                 json_text = result_text[json_start:json_end]
                 contacts = json.loads(json_text)
                 
-                print(f"✅ GPT-4o-mini found {len(contacts)} potential contacts")
+                print(f"✅ GPT-4o-mini captured {len(contacts)} potential contacts")
                 for contact in contacts:
                     name = contact.get('name', 'Unknown')
                     title = contact.get('title', 'Unknown')
@@ -428,8 +349,8 @@ CONTENT:
         
         return []
 
-    def _generate_emails_for_contacts(self, contact_info: list, found_emails: list, domain: str) -> list:
-        """🧪 Generate and verify emails for discovered contacts"""
+    def _generate_emails_for_captured_contacts(self, contact_info: list, found_emails: list, domain: str) -> list:
+        """🧪 Generate and verify emails for captured contacts"""
         
         from account_manager import MillionVerifierManager
         millionverifier = MillionVerifierManager()
@@ -460,7 +381,7 @@ CONTENT:
             last_name = name_parts[-1]
             middle_name = " ".join(name_parts[1:-1]) if len(name_parts) > 2 else ""
             
-            print(f"\n🧪 Generating emails for: {name}")
+            print(f"\n🧪 Generating emails for captured contact: {name}")
             
             # Generate common email patterns
             email_patterns = self._generate_common_email_patterns(first_name, last_name, domain, middle_name)
@@ -577,7 +498,7 @@ CONTENT:
         contacts.sort(key=lambda x: x.get('fire_protection_score', 0), reverse=True)
         return contacts
 
-    # Keep all existing methods from original file
+    # Keep existing methods for regular LinkedIn flow
     def _stealth_website_mapping(self, url: str) -> dict:
         """🗺️ Stealth website mapping using Apify with account rotation"""
         
@@ -634,9 +555,7 @@ async function pageFunction(context) {
         }
         
         try:
-            # Get client with credit-based account rotation for Part 1
             client = get_working_apify_client_part1()
-            
             run = client.actor("apify~web-scraper").call(run_input=payload)
             
             if run:
@@ -723,105 +642,6 @@ Focus on: about, team, staff, people, contact, leadership pages."""
                     break
         
         return selected
-
-    def _extract_staff_and_social(self, urls: list) -> tuple:
-        """🔍 Extract staff and social media from selected URLs"""
-        
-        all_staff = []
-        all_social = {}
-        
-        for i, url in enumerate(urls, 1):
-            print(f"  📄 Processing {i}/{len(urls)}: {url}")
-            
-            try:
-                staff, social = self._analyze_single_url(url)
-                all_staff.extend(staff)
-                all_social.update(social)
-                
-                if staff:
-                    print(f"    ✅ Found {len(staff)} staff members")
-                
-            except Exception as e:
-                print(f"    ⚠️ Error: {e}")
-                
-        return all_staff, all_social
-
-    def _analyze_single_url(self, url: str) -> tuple:
-        """🔍 Analyze single URL for staff and social media using account rotation"""
-        
-        # Clean JavaScript function
-        page_function = """
-        async function pageFunction(context) {
-            const { request, log, jQuery } = context;
-            const $ = jQuery;
-            
-            await context.waitFor(8000);
-            
-            try {
-                const bodyText = $('body').text() || '';
-                const socialMedia = {};
-                
-                $('a[href]').each(function() {
-                    const href = $(this).attr('href');
-                    if (!href) return;
-                    
-                    const lowerHref = href.toLowerCase();
-                    if (lowerHref.includes('linkedin.com') && !socialMedia.linkedin) {
-                        socialMedia.linkedin = href;
-                    } else if (lowerHref.includes('facebook.com') && !socialMedia.facebook) {
-                        socialMedia.facebook = href;
-                    } else if (lowerHref.includes('twitter.com') && !socialMedia.twitter) {
-                        socialMedia.twitter = href;
-                    } else if (lowerHref.includes('instagram.com') && !socialMedia.instagram) {
-                        socialMedia.instagram = href;
-                    }
-                });
-                
-                return {
-                    url: request.url,
-                    content: bodyText,
-                    socialMedia: socialMedia
-                };
-                
-            } catch (error) {
-                return {
-                    url: request.url,
-                    content: '',
-                    socialMedia: {}
-                };
-            }
-        }
-        """
-        
-        payload = {
-            "startUrls": [{"url": url}],
-            "maxPagesPerRun": 1,
-            "pageFunction": page_function,
-            "proxyConfiguration": {"useApifyProxy": True}
-        }
-        
-        try:
-            # Get client with credit-based account rotation for Part 1
-            client = get_working_apify_client_part1()
-            
-            run = client.actor("apify~web-scraper").call(run_input=payload)
-            
-            if run:
-                items = client.dataset(run["defaultDatasetId"]).list_items().items
-                if items:
-                    content = items[0].get('content', '')
-                    social = items[0].get('socialMedia', {})
-                    
-                    # Analyze content with GPT-4o for staff
-                    staff = self._gpt_extract_staff(content, url)
-                    
-                    return staff, social
-            
-            return [], {}
-            
-        except Exception as e:
-            print(f"    ❌ Content analysis failed: {e}")
-            return [], {}
 
     def _gpt_extract_staff(self, content: str, url: str) -> list:
         """🧠 ENHANCED: GPT-4o extracts staff from content with better content analysis"""
