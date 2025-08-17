@@ -1,0 +1,1702 @@
+[
+  {
+    "timestamp": "2025-08-14T17:47:29.753739",
+    "account": "Account_3",
+    "real_time_usage": {
+      "used": 1.428,
+      "limit": 5,
+      "remaining": 3.572,
+      "percentage": 28.6,
+      "compute_units_used": 0.9503577777777779,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.428,
+    "usd_limit": 5,
+    "usd_remaining": 3.572,
+    "compute_units_used": 0.9503577777777779,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-14T17:48:00.659523",
+    "account": "Account_3",
+    "real_time_usage": {
+      "used": 1.429,
+      "limit": 5,
+      "remaining": 3.571,
+      "percentage": 28.6,
+      "compute_units_used": 0.9503577777777779,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.429,
+    "usd_limit": 5,
+    "usd_remaining": 3.571,
+    "compute_units_used": 0.9503577777777779,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T07:18:22.466353",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.433,
+      "limit": 5,
+      "remaining": 3.567,
+      "percentage": 28.7,
+      "compute_units_used": 0.7052966666666667,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.433,
+    "usd_limit": 5,
+    "usd_remaining": 3.567,
+    "compute_units_used": 0.7052966666666667,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T07:18:55.530818",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.433,
+      "limit": 5,
+      "remaining": 3.567,
+      "percentage": 28.7,
+      "compute_units_used": 0.7052966666666667,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.433,
+    "usd_limit": 5,
+    "usd_remaining": 3.567,
+    "compute_units_used": 0.7052966666666667,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T07:19:24.418144",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.44,
+      "limit": 5,
+      "remaining": 3.56,
+      "percentage": 28.8,
+      "compute_units_used": 0.7219466666666666,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.44,
+    "usd_limit": 5,
+    "usd_remaining": 3.56,
+    "compute_units_used": 0.7219466666666666,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T07:19:56.859942",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.453,
+      "limit": 5,
+      "remaining": 3.547,
+      "percentage": 29.1,
+      "compute_units_used": 0.7534822222222222,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.453,
+    "usd_limit": 5,
+    "usd_remaining": 3.547,
+    "compute_units_used": 0.7534822222222222,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T07:20:28.087804",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.455,
+      "limit": 5,
+      "remaining": 3.545,
+      "percentage": 29.1,
+      "compute_units_used": 1.2814966666666672,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.455,
+    "usd_limit": 5,
+    "usd_remaining": 3.545,
+    "compute_units_used": 1.2814966666666672,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T07:24:44.889040",
+    "account": "Account_4",
+    "real_time_usage": {
+      "used": 1.46,
+      "limit": 5,
+      "remaining": 3.54,
+      "percentage": 29.2,
+      "compute_units_used": 1.5665844444444443,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.46,
+    "usd_limit": 5,
+    "usd_remaining": 3.54,
+    "compute_units_used": 1.5665844444444443,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T07:25:15.880402",
+    "account": "Account_4",
+    "real_time_usage": {
+      "used": 1.46,
+      "limit": 5,
+      "remaining": 3.54,
+      "percentage": 29.2,
+      "compute_units_used": 1.5665844444444443,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.46,
+    "usd_limit": 5,
+    "usd_remaining": 3.54,
+    "compute_units_used": 1.5665844444444443,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T07:25:40.721931",
+    "account": "Account_4",
+    "real_time_usage": {
+      "used": 1.47,
+      "limit": 5,
+      "remaining": 3.53,
+      "percentage": 29.4,
+      "compute_units_used": 1.589611111111111,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.47,
+    "usd_limit": 5,
+    "usd_remaining": 3.53,
+    "compute_units_used": 1.589611111111111,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T07:26:55.939418",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.473,
+      "limit": 5,
+      "remaining": 3.527,
+      "percentage": 29.5,
+      "compute_units_used": 0.8000922222222222,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.473,
+    "usd_limit": 5,
+    "usd_remaining": 3.527,
+    "compute_units_used": 0.8000922222222222,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T07:27:26.112287",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.473,
+      "limit": 5,
+      "remaining": 3.527,
+      "percentage": 29.5,
+      "compute_units_used": 0.8000922222222222,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.473,
+    "usd_limit": 5,
+    "usd_remaining": 3.527,
+    "compute_units_used": 0.8000922222222222,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T10:49:36.069262",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.572,
+      "limit": 5,
+      "remaining": 3.428,
+      "percentage": 31.4,
+      "compute_units_used": 1.0365633333333335,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.572,
+    "usd_limit": 5,
+    "usd_remaining": 3.428,
+    "compute_units_used": 1.0365633333333335,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T10:50:05.703446",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.572,
+      "limit": 5,
+      "remaining": 3.428,
+      "percentage": 31.4,
+      "compute_units_used": 1.0365633333333335,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.572,
+    "usd_limit": 5,
+    "usd_remaining": 3.428,
+    "compute_units_used": 1.0365633333333335,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T10:51:26.649269",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.593,
+      "limit": 5,
+      "remaining": 3.407,
+      "percentage": 31.9,
+      "compute_units_used": 1.08579,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.593,
+    "usd_limit": 5,
+    "usd_remaining": 3.407,
+    "compute_units_used": 1.08579,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T10:51:57.655129",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.614,
+      "limit": 5,
+      "remaining": 3.386,
+      "percentage": 32.3,
+      "compute_units_used": 1.1366744444444445,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.614,
+    "usd_limit": 5,
+    "usd_remaining": 3.386,
+    "compute_units_used": 1.1366744444444445,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T10:52:30.058052",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.625,
+      "limit": 5,
+      "remaining": 3.375,
+      "percentage": 32.5,
+      "compute_units_used": 1.16504,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.625,
+    "usd_limit": 5,
+    "usd_remaining": 3.375,
+    "compute_units_used": 1.16504,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T11:02:04.393791",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.633,
+      "limit": 5,
+      "remaining": 3.367,
+      "percentage": 32.7,
+      "compute_units_used": 1.1832888888888888,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.633,
+    "usd_limit": 5,
+    "usd_remaining": 3.367,
+    "compute_units_used": 1.1832888888888888,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T11:03:07.113451",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.635,
+      "limit": 5,
+      "remaining": 3.365,
+      "percentage": 32.7,
+      "compute_units_used": 1.3236133333333335,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.635,
+    "usd_limit": 5,
+    "usd_remaining": 3.365,
+    "compute_units_used": 1.3236133333333335,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T11:05:50.516459",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.658,
+      "limit": 5,
+      "remaining": 3.342,
+      "percentage": 33.2,
+      "compute_units_used": 1.2415233333333333,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.658,
+    "usd_limit": 5,
+    "usd_remaining": 3.342,
+    "compute_units_used": 1.2415233333333333,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T11:06:21.199486",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.658,
+      "limit": 5,
+      "remaining": 3.342,
+      "percentage": 33.2,
+      "compute_units_used": 1.2415233333333333,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.658,
+    "usd_limit": 5,
+    "usd_remaining": 3.342,
+    "compute_units_used": 1.2415233333333333,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T11:07:21.747546",
+    "account": "Account_3",
+    "real_time_usage": {
+      "used": 1.667,
+      "limit": 5,
+      "remaining": 3.333,
+      "percentage": 33.3,
+      "compute_units_used": 0.9940600000000002,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.667,
+    "usd_limit": 5,
+    "usd_remaining": 3.333,
+    "compute_units_used": 0.9940600000000002,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T11:35:33.222249",
+    "account": "Account_3",
+    "real_time_usage": {
+      "used": 1.667,
+      "limit": 5,
+      "remaining": 3.333,
+      "percentage": 33.3,
+      "compute_units_used": 0.9940600000000002,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.667,
+    "usd_limit": 5,
+    "usd_remaining": 3.333,
+    "compute_units_used": 0.9940600000000002,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T11:36:55.206606",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.675,
+      "limit": 5,
+      "remaining": 3.325,
+      "percentage": 33.5,
+      "compute_units_used": 1.2814966666666672,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.675,
+    "usd_limit": 5,
+    "usd_remaining": 3.325,
+    "compute_units_used": 1.2814966666666672,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T11:37:51.138572",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.68,
+      "limit": 5,
+      "remaining": 3.32,
+      "percentage": 33.6,
+      "compute_units_used": 1.2936288888888894,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.68,
+    "usd_limit": 5,
+    "usd_remaining": 3.32,
+    "compute_units_used": 1.2936288888888894,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T11:38:30.115919",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.681,
+      "limit": 5,
+      "remaining": 3.319,
+      "percentage": 33.6,
+      "compute_units_used": 1.2936288888888894,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.681,
+    "usd_limit": 5,
+    "usd_remaining": 3.319,
+    "compute_units_used": 1.2936288888888894,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T11:38:59.823920",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.69,
+      "limit": 5,
+      "remaining": 3.31,
+      "percentage": 33.8,
+      "compute_units_used": 1.3207577777777777,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.69,
+    "usd_limit": 5,
+    "usd_remaining": 3.31,
+    "compute_units_used": 1.3207577777777777,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T11:39:47.688685",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.692,
+      "limit": 5,
+      "remaining": 3.308,
+      "percentage": 33.8,
+      "compute_units_used": 1.325328888888889,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.692,
+    "usd_limit": 5,
+    "usd_remaining": 3.308,
+    "compute_units_used": 1.325328888888889,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:16:07.685971",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.705,
+      "limit": 5,
+      "remaining": 3.295,
+      "percentage": 34.1,
+      "compute_units_used": 1.4950333333333334,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.705,
+    "usd_limit": 5,
+    "usd_remaining": 3.295,
+    "compute_units_used": 1.4950333333333334,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:19:01.187053",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.707,
+      "limit": 5,
+      "remaining": 3.293,
+      "percentage": 34.1,
+      "compute_units_used": 1.3603611111111111,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.707,
+    "usd_limit": 5,
+    "usd_remaining": 3.293,
+    "compute_units_used": 1.3603611111111111,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:19:35.085427",
+    "account": "Account_3",
+    "real_time_usage": {
+      "used": 1.708,
+      "limit": 5,
+      "remaining": 3.292,
+      "percentage": 34.2,
+      "compute_units_used": 1.0952133333333334,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.708,
+    "usd_limit": 5,
+    "usd_remaining": 3.292,
+    "compute_units_used": 1.0952133333333334,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:23:49.282133",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.718,
+      "limit": 5,
+      "remaining": 3.282,
+      "percentage": 34.4,
+      "compute_units_used": 1.3862977777777779,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.718,
+    "usd_limit": 5,
+    "usd_remaining": 3.282,
+    "compute_units_used": 1.3862977777777779,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:31:34.393152",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.72,
+      "limit": 5,
+      "remaining": 3.28,
+      "percentage": 34.4,
+      "compute_units_used": 1.385813333333334,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.72,
+    "usd_limit": 5,
+    "usd_remaining": 3.28,
+    "compute_units_used": 1.385813333333334,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:32:32.301839",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.722,
+      "limit": 5,
+      "remaining": 3.278,
+      "percentage": 34.4,
+      "compute_units_used": 1.391354444444445,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.722,
+    "usd_limit": 5,
+    "usd_remaining": 3.278,
+    "compute_units_used": 1.391354444444445,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:33:05.458633",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.728,
+      "limit": 5,
+      "remaining": 3.272,
+      "percentage": 34.6,
+      "compute_units_used": 1.4098733333333333,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.728,
+    "usd_limit": 5,
+    "usd_remaining": 3.272,
+    "compute_units_used": 1.4098733333333333,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:33:49.551810",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.729,
+      "limit": 5,
+      "remaining": 3.271,
+      "percentage": 34.6,
+      "compute_units_used": 1.4106333333333332,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.729,
+    "usd_limit": 5,
+    "usd_remaining": 3.271,
+    "compute_units_used": 1.4106333333333332,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:34:33.052938",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.751,
+      "limit": 5,
+      "remaining": 3.249,
+      "percentage": 35.0,
+      "compute_units_used": 1.4637622222222222,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.751,
+    "usd_limit": 5,
+    "usd_remaining": 3.249,
+    "compute_units_used": 1.4637622222222222,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:52:32.598540",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.753,
+      "limit": 5,
+      "remaining": 3.247,
+      "percentage": 35.1,
+      "compute_units_used": 1.4639833333333339,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.753,
+    "usd_limit": 5,
+    "usd_remaining": 3.247,
+    "compute_units_used": 1.4639833333333339,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:53:11.633056",
+    "account": "Account_4",
+    "real_time_usage": {
+      "used": 1.753,
+      "limit": 5,
+      "remaining": 3.247,
+      "percentage": 35.1,
+      "compute_units_used": 1.7412755555555555,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.753,
+    "usd_limit": 5,
+    "usd_remaining": 3.247,
+    "compute_units_used": 1.7412755555555555,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:53:45.697539",
+    "account": "Account_4",
+    "real_time_usage": {
+      "used": 1.753,
+      "limit": 5,
+      "remaining": 3.247,
+      "percentage": 35.1,
+      "compute_units_used": 1.7412755555555555,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.753,
+    "usd_limit": 5,
+    "usd_remaining": 3.247,
+    "compute_units_used": 1.7412755555555555,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:54:29.209183",
+    "account": "Account_4",
+    "real_time_usage": {
+      "used": 1.754,
+      "limit": 5,
+      "remaining": 3.246,
+      "percentage": 35.1,
+      "compute_units_used": 1.7412755555555555,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.754,
+    "usd_limit": 5,
+    "usd_remaining": 3.246,
+    "compute_units_used": 1.7412755555555555,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T12:56:07.290689",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.757,
+      "limit": 5,
+      "remaining": 3.243,
+      "percentage": 35.1,
+      "compute_units_used": 1.4787355555555555,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.757,
+    "usd_limit": 5,
+    "usd_remaining": 3.243,
+    "compute_units_used": 1.4787355555555555,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T13:16:54.076974",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.757,
+      "limit": 5,
+      "remaining": 3.243,
+      "percentage": 35.1,
+      "compute_units_used": 1.4787355555555555,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.757,
+    "usd_limit": 5,
+    "usd_remaining": 3.243,
+    "compute_units_used": 1.4787355555555555,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T13:17:18.792587",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.757,
+      "limit": 5,
+      "remaining": 3.243,
+      "percentage": 35.1,
+      "compute_units_used": 1.4787355555555555,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.757,
+    "usd_limit": 5,
+    "usd_remaining": 3.243,
+    "compute_units_used": 1.4787355555555555,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T13:17:52.240746",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.762,
+      "limit": 5,
+      "remaining": 3.238,
+      "percentage": 35.2,
+      "compute_units_used": 1.490211111111111,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.762,
+    "usd_limit": 5,
+    "usd_remaining": 3.238,
+    "compute_units_used": 1.490211111111111,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T13:18:19.130021",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.767,
+      "limit": 5,
+      "remaining": 3.233,
+      "percentage": 35.3,
+      "compute_units_used": 1.4957822222222228,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.767,
+    "usd_limit": 5,
+    "usd_remaining": 3.233,
+    "compute_units_used": 1.4957822222222228,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T13:18:51.162211",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.767,
+      "limit": 5,
+      "remaining": 3.233,
+      "percentage": 35.3,
+      "compute_units_used": 1.4957822222222228,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.767,
+    "usd_limit": 5,
+    "usd_remaining": 3.233,
+    "compute_units_used": 1.4957822222222228,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T16:21:54.914462",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.777,
+      "limit": 5,
+      "remaining": 3.223,
+      "percentage": 35.5,
+      "compute_units_used": 1.518534444444445,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.777,
+    "usd_limit": 5,
+    "usd_remaining": 3.223,
+    "compute_units_used": 1.518534444444445,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T16:22:21.996853",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.777,
+      "limit": 5,
+      "remaining": 3.223,
+      "percentage": 35.5,
+      "compute_units_used": 1.518534444444445,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.777,
+    "usd_limit": 5,
+    "usd_remaining": 3.223,
+    "compute_units_used": 1.518534444444445,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T16:22:55.098437",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.778,
+      "limit": 5,
+      "remaining": 3.222,
+      "percentage": 35.6,
+      "compute_units_used": 1.6719144444444445,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.778,
+    "usd_limit": 5,
+    "usd_remaining": 3.222,
+    "compute_units_used": 1.6719144444444445,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T16:23:24.693661",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.778,
+      "limit": 5,
+      "remaining": 3.222,
+      "percentage": 35.6,
+      "compute_units_used": 1.6719144444444445,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.778,
+    "usd_limit": 5,
+    "usd_remaining": 3.222,
+    "compute_units_used": 1.6719144444444445,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T16:32:54.937220",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.783,
+      "limit": 5,
+      "remaining": 3.217,
+      "percentage": 35.7,
+      "compute_units_used": 1.5382433333333332,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.783,
+    "usd_limit": 5,
+    "usd_remaining": 3.217,
+    "compute_units_used": 1.5382433333333332,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T16:33:45.552720",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.783,
+      "limit": 5,
+      "remaining": 3.217,
+      "percentage": 35.7,
+      "compute_units_used": 1.5382433333333332,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.783,
+    "usd_limit": 5,
+    "usd_remaining": 3.217,
+    "compute_units_used": 1.5382433333333332,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T16:34:16.588671",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.787,
+      "limit": 5,
+      "remaining": 3.213,
+      "percentage": 35.7,
+      "compute_units_used": 1.5492388888888886,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.787,
+    "usd_limit": 5,
+    "usd_remaining": 3.213,
+    "compute_units_used": 1.5492388888888886,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T16:34:48.975401",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.794,
+      "limit": 5,
+      "remaining": 3.206,
+      "percentage": 35.9,
+      "compute_units_used": 1.558494444444445,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.794,
+    "usd_limit": 5,
+    "usd_remaining": 3.206,
+    "compute_units_used": 1.558494444444445,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T16:35:17.441068",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.796,
+      "limit": 5,
+      "remaining": 3.204,
+      "percentage": 35.9,
+      "compute_units_used": 1.7158288888888888,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.796,
+    "usd_limit": 5,
+    "usd_remaining": 3.204,
+    "compute_units_used": 1.7158288888888888,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T19:10:12.763575",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.796,
+      "limit": 5,
+      "remaining": 3.204,
+      "percentage": 35.9,
+      "compute_units_used": 1.7158288888888888,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.796,
+    "usd_limit": 5,
+    "usd_remaining": 3.204,
+    "compute_units_used": 1.7158288888888888,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T19:10:41.159441",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.797,
+      "limit": 5,
+      "remaining": 3.203,
+      "percentage": 35.9,
+      "compute_units_used": 1.7158288888888888,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.797,
+    "usd_limit": 5,
+    "usd_remaining": 3.203,
+    "compute_units_used": 1.7158288888888888,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T19:11:14.232337",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.797,
+      "limit": 5,
+      "remaining": 3.203,
+      "percentage": 35.9,
+      "compute_units_used": 1.7158288888888888,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.797,
+    "usd_limit": 5,
+    "usd_remaining": 3.203,
+    "compute_units_used": 1.7158288888888888,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T19:11:46.376126",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.801,
+      "limit": 5,
+      "remaining": 3.199,
+      "percentage": 36.0,
+      "compute_units_used": 1.577055555555556,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.801,
+    "usd_limit": 5,
+    "usd_remaining": 3.199,
+    "compute_units_used": 1.577055555555556,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-15T19:12:14.698954",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.801,
+      "limit": 5,
+      "remaining": 3.199,
+      "percentage": 36.0,
+      "compute_units_used": 1.577055555555556,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.801,
+    "usd_limit": 5,
+    "usd_remaining": 3.199,
+    "compute_units_used": 1.577055555555556,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T04:46:34.586468",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.81,
+      "limit": 5,
+      "remaining": 3.19,
+      "percentage": 36.2,
+      "compute_units_used": 1.5973322222222228,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.81,
+    "usd_limit": 5,
+    "usd_remaining": 3.19,
+    "compute_units_used": 1.5973322222222228,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T04:47:02.050882",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.81,
+      "limit": 5,
+      "remaining": 3.19,
+      "percentage": 36.2,
+      "compute_units_used": 1.597822222222223,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.81,
+    "usd_limit": 5,
+    "usd_remaining": 3.19,
+    "compute_units_used": 1.597822222222223,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T04:47:31.278422",
+    "account": "Account_3",
+    "real_time_usage": {
+      "used": 1.819,
+      "limit": 5,
+      "remaining": 3.181,
+      "percentage": 36.4,
+      "compute_units_used": 1.3681,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.819,
+    "usd_limit": 5,
+    "usd_remaining": 3.181,
+    "compute_units_used": 1.3681,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T04:48:04.719347",
+    "account": "Account_3",
+    "real_time_usage": {
+      "used": 1.819,
+      "limit": 5,
+      "remaining": 3.181,
+      "percentage": 36.4,
+      "compute_units_used": 1.3681,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.819,
+    "usd_limit": 5,
+    "usd_remaining": 3.181,
+    "compute_units_used": 1.3681,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T04:48:32.747611",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.825,
+      "limit": 5,
+      "remaining": 3.175,
+      "percentage": 36.5,
+      "compute_units_used": 1.7825955555555555,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.825,
+    "usd_limit": 5,
+    "usd_remaining": 3.175,
+    "compute_units_used": 1.7825955555555555,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T04:57:19.614674",
+    "account": "Account_4",
+    "real_time_usage": {
+      "used": 1.821,
+      "limit": 5,
+      "remaining": 3.179,
+      "percentage": 36.4,
+      "compute_units_used": 1.9053488888888888,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.821,
+    "usd_limit": 5,
+    "usd_remaining": 3.179,
+    "compute_units_used": 1.9053488888888888,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T04:57:51.957464",
+    "account": "Account_4",
+    "real_time_usage": {
+      "used": 1.821,
+      "limit": 5,
+      "remaining": 3.179,
+      "percentage": 36.4,
+      "compute_units_used": 1.9053488888888888,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.821,
+    "usd_limit": 5,
+    "usd_remaining": 3.179,
+    "compute_units_used": 1.9053488888888888,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T04:58:20.288818",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.821,
+      "limit": 5,
+      "remaining": 3.179,
+      "percentage": 36.4,
+      "compute_units_used": 1.6292855555555552,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.821,
+    "usd_limit": 5,
+    "usd_remaining": 3.179,
+    "compute_units_used": 1.6292855555555552,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T04:58:54.753716",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.821,
+      "limit": 5,
+      "remaining": 3.179,
+      "percentage": 36.4,
+      "compute_units_used": 1.6292855555555552,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.821,
+    "usd_limit": 5,
+    "usd_remaining": 3.179,
+    "compute_units_used": 1.6292855555555552,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T04:59:21.906364",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.827,
+      "limit": 5,
+      "remaining": 3.173,
+      "percentage": 36.5,
+      "compute_units_used": 1.6364666666666672,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.827,
+    "usd_limit": 5,
+    "usd_remaining": 3.173,
+    "compute_units_used": 1.6364666666666672,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T05:22:23.884856",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.825,
+      "limit": 5,
+      "remaining": 3.175,
+      "percentage": 36.5,
+      "compute_units_used": 1.7825955555555555,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.825,
+    "usd_limit": 5,
+    "usd_remaining": 3.175,
+    "compute_units_used": 1.7825955555555555,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T05:22:52.886379",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.825,
+      "limit": 5,
+      "remaining": 3.175,
+      "percentage": 36.5,
+      "compute_units_used": 1.7825955555555555,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.825,
+    "usd_limit": 5,
+    "usd_remaining": 3.175,
+    "compute_units_used": 1.7825955555555555,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T05:23:21.494934",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.827,
+      "limit": 5,
+      "remaining": 3.173,
+      "percentage": 36.5,
+      "compute_units_used": 1.6364666666666672,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.827,
+    "usd_limit": 5,
+    "usd_remaining": 3.173,
+    "compute_units_used": 1.6364666666666672,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T05:23:51.456082",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.827,
+      "limit": 5,
+      "remaining": 3.173,
+      "percentage": 36.5,
+      "compute_units_used": 1.6364666666666672,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.827,
+    "usd_limit": 5,
+    "usd_remaining": 3.173,
+    "compute_units_used": 1.6364666666666672,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T05:24:24.290235",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.843,
+      "limit": 5,
+      "remaining": 3.157,
+      "percentage": 36.9,
+      "compute_units_used": 1.8240711111111112,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.843,
+    "usd_limit": 5,
+    "usd_remaining": 3.157,
+    "compute_units_used": 1.8240711111111112,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-16T17:17:38.397274",
+    "account": "Account_3",
+    "real_time_usage": {
+      "used": 1.838,
+      "limit": 5,
+      "remaining": 3.162,
+      "percentage": 36.8,
+      "compute_units_used": 1.4132900000000002,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.838,
+    "usd_limit": 5,
+    "usd_remaining": 3.162,
+    "compute_units_used": 1.4132900000000002,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:28:14.389272",
+    "account": "Account_4",
+    "real_time_usage": {
+      "used": 1.84,
+      "limit": 5,
+      "remaining": 3.16,
+      "percentage": 36.8,
+      "compute_units_used": 1.9521766666666667,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.84,
+    "usd_limit": 5,
+    "usd_remaining": 3.16,
+    "compute_units_used": 1.9521766666666667,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:28:44.541674",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.84,
+      "limit": 5,
+      "remaining": 3.16,
+      "percentage": 36.8,
+      "compute_units_used": 1.674861111111111,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.84,
+    "usd_limit": 5,
+    "usd_remaining": 3.16,
+    "compute_units_used": 1.674861111111111,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:29:14.556463",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.84,
+      "limit": 5,
+      "remaining": 3.16,
+      "percentage": 36.8,
+      "compute_units_used": 1.6759577777777774,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.84,
+    "usd_limit": 5,
+    "usd_remaining": 3.16,
+    "compute_units_used": 1.6759577777777774,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:29:44.351781",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.843,
+      "limit": 5,
+      "remaining": 3.157,
+      "percentage": 36.9,
+      "compute_units_used": 1.8240711111111112,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.843,
+    "usd_limit": 5,
+    "usd_remaining": 3.157,
+    "compute_units_used": 1.8240711111111112,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:30:15.289708",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.843,
+      "limit": 5,
+      "remaining": 3.157,
+      "percentage": 36.9,
+      "compute_units_used": 1.8240711111111112,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.843,
+    "usd_limit": 5,
+    "usd_remaining": 3.157,
+    "compute_units_used": 1.8240711111111112,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:48:32.858529",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.846,
+      "limit": 5,
+      "remaining": 3.154,
+      "percentage": 36.9,
+      "compute_units_used": 1.680603333333334,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.846,
+    "usd_limit": 5,
+    "usd_remaining": 3.154,
+    "compute_units_used": 1.680603333333334,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:49:09.980121",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.846,
+      "limit": 5,
+      "remaining": 3.154,
+      "percentage": 36.9,
+      "compute_units_used": 1.680603333333334,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.846,
+    "usd_limit": 5,
+    "usd_remaining": 3.154,
+    "compute_units_used": 1.680603333333334,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:49:48.635732",
+    "account": "Account_3",
+    "real_time_usage": {
+      "used": 1.847,
+      "limit": 5,
+      "remaining": 3.153,
+      "percentage": 36.9,
+      "compute_units_used": 1.4329044444444445,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.847,
+    "usd_limit": 5,
+    "usd_remaining": 3.153,
+    "compute_units_used": 1.4329044444444445,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:50:52.445658",
+    "account": "Account_4",
+    "real_time_usage": {
+      "used": 1.85,
+      "limit": 5,
+      "remaining": 3.15,
+      "percentage": 37.0,
+      "compute_units_used": 1.9738355555555556,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.85,
+    "usd_limit": 5,
+    "usd_remaining": 3.15,
+    "compute_units_used": 1.9738355555555556,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:51:31.227475",
+    "account": "Account_4",
+    "real_time_usage": {
+      "used": 1.85,
+      "limit": 5,
+      "remaining": 3.15,
+      "percentage": 37.0,
+      "compute_units_used": 1.9738355555555556,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.85,
+    "usd_limit": 5,
+    "usd_remaining": 3.15,
+    "compute_units_used": 1.9738355555555556,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:54:03.109179",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.851,
+      "limit": 5,
+      "remaining": 3.149,
+      "percentage": 37.0,
+      "compute_units_used": 1.84382,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.851,
+    "usd_limit": 5,
+    "usd_remaining": 3.149,
+    "compute_units_used": 1.84382,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:54:43.903536",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.851,
+      "limit": 5,
+      "remaining": 3.149,
+      "percentage": 37.0,
+      "compute_units_used": 1.84382,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.851,
+    "usd_limit": 5,
+    "usd_remaining": 3.149,
+    "compute_units_used": 1.84382,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:55:15.098990",
+    "account": "Account_2",
+    "real_time_usage": {
+      "used": 1.854,
+      "limit": 5,
+      "remaining": 3.146,
+      "percentage": 37.1,
+      "compute_units_used": 1.8491633333333333,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.854,
+    "usd_limit": 5,
+    "usd_remaining": 3.146,
+    "compute_units_used": 1.8491633333333333,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:55:45.481647",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.86,
+      "limit": 5,
+      "remaining": 3.14,
+      "percentage": 37.2,
+      "compute_units_used": 1.720983333333333,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.86,
+    "usd_limit": 5,
+    "usd_remaining": 3.14,
+    "compute_units_used": 1.720983333333333,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:56:23.041802",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.86,
+      "limit": 5,
+      "remaining": 3.14,
+      "percentage": 37.2,
+      "compute_units_used": 1.720983333333333,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.86,
+    "usd_limit": 5,
+    "usd_remaining": 3.14,
+    "compute_units_used": 1.720983333333333,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:58:22.932608",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.862,
+      "limit": 5,
+      "remaining": 3.138,
+      "percentage": 37.2,
+      "compute_units_used": 2.004358888888889,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.862,
+    "usd_limit": 5,
+    "usd_remaining": 3.138,
+    "compute_units_used": 2.004358888888889,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:59:00.564313",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.871,
+      "limit": 5,
+      "remaining": 3.129,
+      "percentage": 37.4,
+      "compute_units_used": 1.7414255555555562,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.871,
+    "usd_limit": 5,
+    "usd_remaining": 3.129,
+    "compute_units_used": 1.7414255555555562,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T12:59:33.464608",
+    "account": "Account_1",
+    "real_time_usage": {
+      "used": 1.871,
+      "limit": 5,
+      "remaining": 3.129,
+      "percentage": 37.4,
+      "compute_units_used": 1.7414255555555562,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.871,
+    "usd_limit": 5,
+    "usd_remaining": 3.129,
+    "compute_units_used": 1.7414255555555562,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T13:00:08.595969",
+    "account": "Account_3",
+    "real_time_usage": {
+      "used": 1.871,
+      "limit": 5,
+      "remaining": 3.129,
+      "percentage": 37.4,
+      "compute_units_used": 1.4929311111111112,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.871,
+    "usd_limit": 5,
+    "usd_remaining": 3.129,
+    "compute_units_used": 1.4929311111111112,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T13:01:13.214670",
+    "account": "Account_4",
+    "real_time_usage": {
+      "used": 1.872,
+      "limit": 5,
+      "remaining": 3.128,
+      "percentage": 37.4,
+      "compute_units_used": 1.7501566666666664,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.872,
+    "usd_limit": 5,
+    "usd_remaining": 3.128,
+    "compute_units_used": 1.7501566666666664,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T13:02:49.102297",
+    "account": "Account_4",
+    "real_time_usage": {
+      "used": 1.872,
+      "limit": 5,
+      "remaining": 3.128,
+      "percentage": 37.4,
+      "compute_units_used": 1.7501566666666664,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.872,
+    "usd_limit": 5,
+    "usd_remaining": 3.128,
+    "compute_units_used": 1.7501566666666664,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T13:15:11.734893",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.876,
+      "limit": 5,
+      "remaining": 3.124,
+      "percentage": 37.5,
+      "compute_units_used": 2.0353488888888887,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.876,
+    "usd_limit": 5,
+    "usd_remaining": 3.124,
+    "compute_units_used": 2.0353488888888887,
+    "compute_units_limit": 625
+  },
+  {
+    "timestamp": "2025-08-17T13:15:51.113507",
+    "account": "Account_5",
+    "real_time_usage": {
+      "used": 1.876,
+      "limit": 5,
+      "remaining": 3.124,
+      "percentage": 37.5,
+      "compute_units_used": 2.036332222222222,
+      "compute_units_limit": 625
+    },
+    "usd_used": 1.876,
+    "usd_limit": 5,
+    "usd_remaining": 3.124,
+    "compute_units_used": 2.036332222222222,
+    "compute_units_limit": 625
+  }
+]

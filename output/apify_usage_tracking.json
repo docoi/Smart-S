@@ -1,0 +1,27 @@
+{
+  "1": {
+    "runs_used": 5,
+    "runs_limit": 8,
+    "last_reset": "2025-08"
+  },
+  "2": {
+    "runs_used": 6,
+    "runs_limit": 8,
+    "last_reset": "2025-08"
+  },
+  "3": {
+    "runs_used": 6,
+    "runs_limit": 8,
+    "last_reset": "2025-08"
+  },
+  "4": {
+    "runs_used": 6,
+    "runs_limit": 8,
+    "last_reset": "2025-08"
+  },
+  "5": {
+    "runs_used": 10,
+    "runs_limit": 8,
+    "last_reset": "2025-08"
+  }
+}
