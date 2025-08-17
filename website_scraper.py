@@ -350,28 +350,61 @@ CONTENT:
         return []
 
     def _generate_emails_for_captured_contacts(self, contact_info: list, found_emails: list, domain: str) -> list:
-        """🧪 Generate and verify emails for captured contacts"""
+        """🧪 ENHANCED: Generate and verify emails for captured contacts with smart matching"""
         
         from account_manager import MillionVerifierManager
         millionverifier = MillionVerifierManager()
         
         verified_contacts = []
         
-        # First, add any directly found emails as contacts
-        for email in found_emails:
-            contact = {
-                'name': self._extract_name_from_email(email),
-                'title': 'Contact Person',
-                'email': email,
-                'email_source': 'direct_extraction',
-                'verification_status': 'found_on_website',
-                'fire_protection_relevance': 'medium'
-            }
-            verified_contacts.append(contact)
-            print(f"   📧 Direct email added: {email}")
+        # 🧠 SMART MATCHING: Match found emails with discovered contacts
+        print(f"\n🧠 SMART CONTACT MATCHING:")
+        print(f"   📧 Found emails: {found_emails}")
+        print(f"   👤 Discovered contacts: {[c.get('name', 'Unknown') for c in contact_info]}")
         
-        # Then, generate emails for named contacts
-        for contact in contact_info:
+        # First, try to match direct emails with discovered contacts
+        for email in found_emails:
+            print(f"\n📧 Processing direct email: {email}")
+            
+            # ✅ IMPROVEMENT 1: Verify email with MillionVerifier
+            print(f"   🔍 Verifying email with MillionVerifier...")
+            if not millionverifier.smart_verify_email(email, domain):
+                print(f"   ❌ Email failed verification: {email}")
+                continue
+            
+            # ✅ IMPROVEMENT 2: Smart contact matching
+            matched_contact = self._match_email_to_contact(email, contact_info, domain)
+            
+            if matched_contact:
+                contact = {
+                    'name': matched_contact.get('name', 'Contact Person'),
+                    'title': matched_contact.get('title', 'Contact Person'),
+                    'email': email,
+                    'phone': matched_contact.get('phone', ''),
+                    'role_type': matched_contact.get('role_type', 'staff'),
+                    'email_source': 'direct_extraction_verified',
+                    'verification_status': 'verified',
+                    'fire_protection_relevance': matched_contact.get('fire_protection_relevance', 'medium')
+                }
+                verified_contacts.append(contact)
+                print(f"   ✅ SMART MATCH: {email} → {matched_contact.get('name')} ({matched_contact.get('title')})")
+            else:
+                # Use generic contact info for unmatched emails
+                contact = {
+                    'name': self._extract_name_from_email(email),
+                    'title': 'Contact Person',
+                    'email': email,
+                    'email_source': 'direct_extraction_verified',
+                    'verification_status': 'verified',
+                    'fire_protection_relevance': 'medium'
+                }
+                verified_contacts.append(contact)
+                print(f"   ✅ Email verified but no contact match: {email}")
+        
+        # Then, generate emails for named contacts without direct emails
+        unmatched_contacts = [c for c in contact_info if not self._contact_has_direct_email(c, found_emails)]
+        
+        for contact in unmatched_contacts:
             name = contact.get('name', '')
             if not name or len(name.split()) < 2:
                 continue
@@ -381,7 +414,7 @@ CONTENT:
             last_name = name_parts[-1]
             middle_name = " ".join(name_parts[1:-1]) if len(name_parts) > 2 else ""
             
-            print(f"\n🧪 Generating emails for captured contact: {name}")
+            print(f"\n🧪 Generating emails for unmatched contact: {name}")
             
             # Generate common email patterns
             email_patterns = self._generate_common_email_patterns(first_name, last_name, domain, middle_name)
@@ -406,6 +439,76 @@ CONTENT:
                 print(f"   😞 No valid email found for {name}")
         
         return verified_contacts
+
+    def _match_email_to_contact(self, email: str, contact_info: list, domain: str) -> dict:
+        """🧠 SMART: Match a direct email to a discovered contact person"""
+        
+        if not contact_info:
+            return None
+        
+        email_local = email.split('@')[0].lower()
+        
+        # Strategy 1: Look for generic emails that should match with decision makers
+        generic_emails = ['staff', 'info', 'contact', 'admin', 'office', 'hello']
+        
+        if any(generic in email_local for generic in generic_emails):
+            # For generic emails, prefer owners/managers over regular staff
+            priority_contacts = []
+            
+            for contact in contact_info:
+                role_type = contact.get('role_type', '').lower()
+                title = contact.get('title', '').lower()
+                
+                # Prioritize decision makers for generic emails
+                if role_type in ['owner', 'director', 'manager']:
+                    priority_contacts.append(contact)
+                elif any(keyword in title for keyword in ['owner', 'director', 'manager', 'ceo', 'md']):
+                    priority_contacts.append(contact)
+            
+            if priority_contacts:
+                # Return the highest priority contact
+                best_contact = priority_contacts[0]
+                print(f"   🎯 SMART MATCH: Generic email '{email}' matched to decision maker '{best_contact.get('name')}'")
+                return best_contact
+            else:
+                # Return first available contact if no decision makers found
+                return contact_info[0] if contact_info else None
+        
+        # Strategy 2: Look for name-based matches
+        for contact in contact_info:
+            name = contact.get('name', '').lower()
+            first_name = name.split()[0] if name.split() else ''
+            
+            if first_name and first_name in email_local:
+                print(f"   🎯 NAME MATCH: Email '{email}' matched to '{contact.get('name')}' by first name")
+                return contact
+        
+        # Strategy 3: For any other emails, return the most relevant contact
+        if contact_info:
+            # Prefer decision makers
+            for contact in contact_info:
+                role_type = contact.get('role_type', '').lower()
+                if role_type in ['owner', 'director', 'manager']:
+                    print(f"   🎯 DEFAULT MATCH: Email '{email}' matched to decision maker '{contact.get('name')}'")
+                    return contact
+            
+            # Otherwise return first contact
+            print(f"   🎯 FALLBACK MATCH: Email '{email}' matched to '{contact_info[0].get('name')}'")
+            return contact_info[0]
+        
+        return None
+
+    def _contact_has_direct_email(self, contact: dict, found_emails: list) -> bool:
+        """Check if a contact already has a direct email match"""
+        name = contact.get('name', '').lower()
+        first_name = name.split()[0] if name.split() else ''
+        
+        for email in found_emails:
+            email_local = email.split('@')[0].lower()
+            if first_name and first_name in email_local:
+                return True
+        
+        return False
 
     def _generate_common_email_patterns(self, first_name: str, last_name: str, domain: str, middle_name: str = "") -> list:
         """Generate common email patterns for business contacts"""
@@ -450,7 +553,7 @@ CONTENT:
             return local_part.capitalize()
 
     def _score_website_contacts_fire_protection(self, contacts: list) -> list:
-        """🔥 Score website contacts for fire protection relevance"""
+        """🔥 ENHANCED: Score website contacts for fire protection relevance with better owner scoring"""
         
         for contact in contacts:
             title = contact.get('title', '').lower()
@@ -461,38 +564,49 @@ CONTENT:
             score = 0
             reason = 'General contact'
             
-            # Score based on role type
-            if role_type in ['owner', 'director']:
-                score += 80
-                reason = 'Business owner/director - ultimate responsibility for compliance'
-            elif role_type in ['manager']:
-                score += 70
-                reason = 'Management role - budget authority for safety investments'
+            # 🔥 ENHANCED: Much higher scores for business owners and decision makers
+            if role_type in ['owner', 'director'] or 'owner' in title:
+                score += 95
+                reason = 'Business owner - ultimate responsibility for fire safety compliance and purchasing decisions'
+            elif role_type in ['manager'] or any(keyword in title for keyword in ['manager', 'director', 'ceo', 'md']):
+                score += 85
+                reason = 'Management role - budget authority and responsibility for safety investments'
             
-            # Score based on title keywords
-            if any(keyword in title for keyword in ['facilities', 'operations', 'maintenance']):
+            # Score based on title keywords (enhanced)
+            if any(keyword in title for keyword in ['facilities', 'operations', 'maintenance', 'building']):
                 score += 100
-                reason = 'Facilities/Operations role - direct building responsibility'
-            elif any(keyword in title for keyword in ['safety', 'compliance', 'risk']):
+                reason = 'Facilities/Operations role - direct building safety responsibility'
+            elif any(keyword in title for keyword in ['safety', 'compliance', 'risk', 'health']):
                 score += 100
                 reason = 'Safety role - direct fire protection responsibility'
-            elif any(keyword in title for keyword in ['owner', 'director', 'ceo', 'md']):
-                score += 80
-                reason = 'Senior leadership - compliance responsibility'
-            elif any(keyword in title for keyword in ['manager']):
-                score += 60
-                reason = 'Management role - safety decision maker'
+            elif any(keyword in title for keyword in ['ceo', 'managing director', 'founder']):
+                score += 90
+                reason = 'Senior leadership - ultimate compliance and purchasing authority'
+            
+            # 🔥 ENHANCED: Boost for decision makers with generic emails (like staff@company.com)
+            email = contact.get('email', '')
+            email_source = contact.get('email_source', '')
+            if 'direct_extraction' in email_source and any(keyword in email for keyword in ['staff', 'info', 'contact']):
+                if score >= 80:  # Only boost if already a decision maker
+                    score += 10
+                    reason += ' (reached via main business contact)'
             
             # Boost score based on existing GPT relevance assessment
             if existing_relevance == 'high':
-                score += 30
+                score += 20
             elif existing_relevance == 'medium':
-                score += 15
+                score += 10
+            
+            # 🔥 ENHANCED: Minimum score for any business contact
+            if score < 30:
+                score = 30
+                reason = 'Business contact - potential fire safety decision involvement'
             
             contact['fire_protection_score'] = score
             contact['fire_protection_reason'] = reason
             
-            print(f"   🔥 {contact['name']} - Score: {score} | {reason}")
+            print(f"   🔥 {contact['name']} ({contact.get('title', 'Unknown')}) - Score: {score}")
+            print(f"      Reason: {reason}")
         
         # Sort by score and return top contacts
         contacts.sort(key=lambda x: x.get('fire_protection_score', 0), reverse=True)
