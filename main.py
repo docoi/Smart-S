@@ -1,22 +1,24 @@
 #!/usr/bin/env python3
 """
-🚀 COMPLETE WORKFLOW SUPER SCRAPER - MODULAR VERSION
-==================================================
+🚀 COMPLETE WORKFLOW SUPER SCRAPER - BULLETPROOF VERSION
+=======================================================
 ✅ FIXED: All syntax errors and duplicates removed
 ✅ FIXED: Modular structure for easier maintenance
 ✅ FIXED: Enhanced staff extraction with increased content limits
 ✅ FIXED: Smart pattern learning and email discovery
 ✅ FIXED: Real-time credit monitoring and account rotation
+✅ NEW: Bulletproof fallback system for websites without LinkedIn
 
 Usage: python main.py --url https://www.vikingstaffingandevents.co.uk/
 
 Features:
 ✅ Website scraping with enhanced GPT-4o analysis (100K chars vs 15K)
 ✅ LinkedIn employee discovery with smart email patterns
-✅ Real-time credit monitoring with automatic account switching
+✅ 🛡️ BULLETPROOF FALLBACK: Works even without LinkedIn
+✅ Direct email extraction from website content
+✅ GPT-4o-mini contact discovery from website content
 ✅ Smart MillionVerifier with catch-all domain intelligence
-✅ GPT-4o-mini person validation (filters out company accounts)
-✅ Pattern learning that discovers successful patterns and applies to all contacts
+✅ Pattern learning and email generation for discovered contacts
 ✅ Fire protection targeting with advanced scoring
 ✅ AI email generation and sending
 """
@@ -49,7 +51,7 @@ except ImportError as e:
 
 
 class CompleteWorkflowSuperScraper:
-    """🚀 Complete workflow orchestrator - coordinates all modules"""
+    """🚀 Complete workflow orchestrator with bulletproof fallback systems"""
     
     def __init__(self):
         self.openai_key = os.getenv('OPENAI_API_KEY')
@@ -63,18 +65,20 @@ class CompleteWorkflowSuperScraper:
         self.website_scraper = WebsiteScraper(self.openai_key)
         self.linkedin_scraper = LinkedInScraper(self.openai_key, self.millionverifier)
         
-        print("🚀 COMPLETE WORKFLOW SUPER SCRAPER INITIALIZED")
+        print("🚀 COMPLETE WORKFLOW SUPER SCRAPER INITIALIZED - BULLETPROOF VERSION")
         print(f"🧠 AI: GPT-4o analysis + GPT-4o-mini person validation")
         print(f"🛡️ Stealth: Apify cheapest proxies with account rotation")
+        print(f"🛡️ NEW: Bulletproof fallback for websites without LinkedIn")
         print(f"📧 Test emails: {self.test_email}")
 
     def run_complete_workflow(self, website_url: str) -> dict:
-        """🎯 Complete workflow: Website → LinkedIn → Emails → Send"""
+        """🎯 BULLETPROOF workflow: Website → LinkedIn OR Website Fallback → Emails → Send"""
         
-        print("\n🎯 STARTING COMPLETE WORKFLOW")
-        print("=" * 60)
+        print("\n🎯 STARTING BULLETPROOF COMPLETE WORKFLOW")
+        print("=" * 70)
         print(f"🌐 Target: {website_url}")
-        print(f"🔄 Process: Website → Staff → LinkedIn → Patterns → AI → Send")
+        print(f"🔄 Process: Website → Staff → LinkedIn OR Fallback → Patterns → AI → Send")
+        print(f"🛡️ Fallback: Direct website contact extraction if LinkedIn fails")
         print(f"📧 Test mode: All emails go to {self.test_email}")
         print()
         
@@ -83,9 +87,11 @@ class CompleteWorkflowSuperScraper:
             'website_staff': [],
             'linkedin_url': '',
             'linkedin_employees': [],
+            'fallback_contacts': [],
             'verified_contacts': [],
             'emails_sent': [],
-            'status': 'started'
+            'status': 'started',
+            'workflow_path': 'unknown'
         }
         
         try:
@@ -97,44 +103,58 @@ class CompleteWorkflowSuperScraper:
             results['website_staff'] = website_staff
             results['linkedin_url'] = linkedin_url
             
-            if not linkedin_url:
-                print("❌ No LinkedIn URL found - cannot continue to Part 2")
-                results['status'] = 'failed_no_linkedin'
-                return results
-            
             print(f"✅ Part 1 complete: {len(website_staff)} staff + LinkedIn URL")
             
             # Cooling-off period before Part 2
-            print("\n⏳ COOLING-OFF PERIOD: Waiting 3 seconds before LinkedIn phase...")
+            print("\n⏳ COOLING-OFF PERIOD: Waiting 3 seconds before next phase...")
             time.sleep(3)
             
-            # PART 2: LinkedIn pipeline
-            print(f"\n🔗 PART 2: LINKEDIN PIPELINE")
-            print("-" * 40)
-            print(f"🏢 Using modular LinkedIn pipeline with advanced features")
-            print(f"✅ Features: Actor 2 + 33 Golden Patterns + Smart MillionVerifier + Pattern Learning")
-            
-            # Extract domain for LinkedIn processing
-            domain = urlparse(website_url).netloc.replace('www.', '')
-            verified_contacts = self.linkedin_scraper.scrape_linkedin_and_discover_emails(linkedin_url, domain)
+            # DECISION POINT: LinkedIn or Fallback?
+            if linkedin_url:
+                print(f"\n🔗 PART 2: LINKEDIN PIPELINE")
+                print("-" * 40)
+                print(f"🏢 LinkedIn URL found: {linkedin_url}")
+                print(f"✅ Using LinkedIn pipeline with advanced features")
+                
+                results['workflow_path'] = 'linkedin_pipeline'
+                
+                # Extract domain for LinkedIn processing
+                domain = urlparse(website_url).netloc.replace('www.', '')
+                verified_contacts = self.linkedin_scraper.scrape_linkedin_and_discover_emails(linkedin_url, domain)
+                
+                if verified_contacts:
+                    results['linkedin_employees'] = verified_contacts
+                    results['verified_contacts'] = verified_contacts
+                else:
+                    print("⚠️ LinkedIn pipeline found no contacts - trying fallback...")
+                    verified_contacts = self._run_fallback_pipeline(website_url, results)
+                    
+            else:
+                print(f"\n🛡️ PART 2: WEBSITE FALLBACK PIPELINE")
+                print("-" * 50)
+                print(f"❌ No LinkedIn URL found - activating bulletproof fallback")
+                print(f"🎯 Strategy: Direct website contact extraction")
+                
+                results['workflow_path'] = 'fallback_pipeline'
+                verified_contacts = self._run_fallback_pipeline(website_url, results)
             
             if not verified_contacts:
-                print("❌ No verified email addresses found")
-                results['status'] = 'failed_no_emails'
+                print("❌ No verified email addresses found in any pipeline")
+                results['status'] = 'failed_no_contacts'
                 return results
             
             # PART 3: AI email generation and sending
             print(f"\n🤖 PART 3: AI EMAIL GENERATION & SENDING")
             print("-" * 40)
+            domain = urlparse(website_url).netloc.replace('www.', '')
             emails_sent = self._generate_and_send_emails(verified_contacts, domain)
             
-            results['linkedin_employees'] = verified_contacts  # Store all found employees
-            results['verified_contacts'] = verified_contacts
             results['emails_sent'] = emails_sent
             results['status'] = 'completed'
             
-            print(f"✅ Complete workflow finished!")
+            print(f"✅ Complete bulletproof workflow finished!")
             print(f"📧 {len(emails_sent)} fire protection emails sent to {self.test_email}")
+            print(f"🔄 Workflow path used: {results['workflow_path']}")
             
             return results
             
@@ -143,6 +163,32 @@ class CompleteWorkflowSuperScraper:
             results['status'] = 'failed'
             results['error'] = str(e)
             return results
+
+    def _run_fallback_pipeline(self, website_url: str, results: dict) -> list:
+        """🛡️ Run the bulletproof fallback pipeline"""
+        
+        fallback_contacts = self.website_scraper.website_fallback_pipeline(website_url)
+        results['fallback_contacts'] = fallback_contacts
+        
+        if fallback_contacts:
+            print(f"🎉 Fallback pipeline successful: {len(fallback_contacts)} contacts found")
+            
+            # Take top contacts based on fire protection score
+            top_contacts = sorted(fallback_contacts, 
+                                key=lambda x: x.get('fire_protection_score', 0), 
+                                reverse=True)[:3]  # Top 3 contacts
+            
+            print(f"🎯 Selected top {len(top_contacts)} contacts for email generation:")
+            for i, contact in enumerate(top_contacts, 1):
+                name = contact.get('name', 'Unknown')
+                score = contact.get('fire_protection_score', 0)
+                email = contact.get('email', 'No email')
+                print(f"   {i}. {name} - Score: {score} - Email: {email}")
+            
+            return top_contacts
+        else:
+            print("❌ Fallback pipeline also failed to find contacts")
+            return []
 
     def _generate_and_send_emails(self, verified_contacts: list, domain: str) -> list:
         """🤖 AI email generation and sending"""
@@ -233,18 +279,20 @@ class CompleteWorkflowSuperScraper:
         
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         domain = urlparse(results['website_url']).netloc.replace('www.', '').replace('.', '_')
+        workflow_path = results.get('workflow_path', 'unknown')
         
         # Main results file
-        main_filename = f"output/complete_workflow_{domain}_{timestamp}.csv"
+        main_filename = f"output/complete_workflow_{domain}_{workflow_path}_{timestamp}.csv"
         
         with open(main_filename, 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             
             # Header
-            writer.writerow(['Complete Workflow Results'])
+            writer.writerow(['Complete Bulletproof Workflow Results'])
             writer.writerow(['Timestamp', timestamp])
             writer.writerow(['Website', results['website_url']])
             writer.writerow(['LinkedIn', results['linkedin_url']])
+            writer.writerow(['Workflow Path', workflow_path])
             writer.writerow(['Status', results['status']])
             writer.writerow([])
             
@@ -255,22 +303,38 @@ class CompleteWorkflowSuperScraper:
                 writer.writerow([staff.get('name', ''), staff.get('title', ''), 'Website'])
             writer.writerow([])
             
-            # All LinkedIn employees found
-            writer.writerow(['All LinkedIn Employees Found'])
-            writer.writerow(['Name', 'Title', 'Email', 'Fire Protection Score', 'Priority'])
-            for employee in results.get('linkedin_employees', []):
-                writer.writerow([
-                    employee.get('name', ''),
-                    employee.get('title', ''),
-                    employee.get('email', ''),
-                    employee.get('fire_protection_score', ''),
-                    employee.get('priority', '')
-                ])
-            writer.writerow([])
+            # LinkedIn employees (if any)
+            if results.get('linkedin_employees'):
+                writer.writerow(['LinkedIn Employees Found'])
+                writer.writerow(['Name', 'Title', 'Email', 'Fire Protection Score', 'Priority'])
+                for employee in results.get('linkedin_employees', []):
+                    writer.writerow([
+                        employee.get('name', ''),
+                        employee.get('title', ''),
+                        employee.get('email', ''),
+                        employee.get('fire_protection_score', ''),
+                        employee.get('priority', '')
+                    ])
+                writer.writerow([])
             
-            # Fire protection targets contacted
+            # Fallback contacts (if any)
+            if results.get('fallback_contacts'):
+                writer.writerow(['Website Fallback Contacts Found'])
+                writer.writerow(['Name', 'Title', 'Email', 'Fire Protection Score', 'Email Source', 'Role Type'])
+                for contact in results.get('fallback_contacts', []):
+                    writer.writerow([
+                        contact.get('name', ''),
+                        contact.get('title', ''),
+                        contact.get('email', ''),
+                        contact.get('fire_protection_score', ''),
+                        contact.get('email_source', ''),
+                        contact.get('role_type', '')
+                    ])
+                writer.writerow([])
+            
+            # Final contacted targets
             writer.writerow(['Fire Protection Targets Contacted'])
-            writer.writerow(['Name', 'Title', 'Email', 'Fire Protection Score', 'Subject', 'Email Sent'])
+            writer.writerow(['Name', 'Title', 'Email', 'Fire Protection Score', 'Subject', 'Email Sent', 'Contact Source'])
             for email in results['emails_sent']:
                 writer.writerow([
                     email.get('name', ''),
@@ -278,47 +342,11 @@ class CompleteWorkflowSuperScraper:
                     email.get('email', ''),
                     email.get('fire_protection_score', ''),
                     email.get('subject', ''),
-                    'Yes' if email.get('email_sent') else 'No'
+                    'Yes' if email.get('email_sent') else 'No',
+                    email.get('email_source', '')
                 ])
         
-        # Separate detailed staff file
-        staff_filename = f"output/all_staff_{domain}_{timestamp}.csv"
-        
-        with open(staff_filename, 'w', newline='', encoding='utf-8') as f:
-            fieldnames = ['name', 'title', 'email', 'source', 'fire_protection_score', 'fire_protection_reason', 'priority', 'company', 'linkedin_profile_url']
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
-            writer.writeheader()
-            
-            # Add website staff
-            for staff in results['website_staff']:
-                writer.writerow({
-                    'name': staff.get('name', ''),
-                    'title': staff.get('title', ''),
-                    'email': '',
-                    'source': 'Website',
-                    'fire_protection_score': '',
-                    'fire_protection_reason': '',
-                    'priority': '',
-                    'company': '',
-                    'linkedin_profile_url': ''
-                })
-            
-            # Add all LinkedIn employees
-            for employee in results.get('linkedin_employees', []):
-                writer.writerow({
-                    'name': employee.get('name', ''),
-                    'title': employee.get('title', ''),
-                    'email': employee.get('email', ''),
-                    'source': 'LinkedIn',
-                    'fire_protection_score': employee.get('fire_protection_score', ''),
-                    'fire_protection_reason': employee.get('fire_protection_reason', ''),
-                    'priority': employee.get('priority', ''),
-                    'company': employee.get('company', ''),
-                    'linkedin_profile_url': employee.get('linkedin_profile_url', '')
-                })
-        
-        print(f"💾 Main results saved: {main_filename}")
-        print(f"💾 Staff details saved: {staff_filename}")
+        print(f"💾 Results saved: {main_filename}")
         
         return main_filename
 
@@ -326,19 +354,20 @@ class CompleteWorkflowSuperScraper:
 def main():
     """🚀 CLI interface and main execution"""
     
-    parser = argparse.ArgumentParser(description="🚀 Complete Workflow Super Scraper - MODULAR VERSION")
+    parser = argparse.ArgumentParser(description="🚀 Complete Workflow Super Scraper - BULLETPROOF VERSION")
     parser.add_argument("--url", required=True, help="Target website URL")
     parser.add_argument("--credit-threshold", type=float, default=4.85, 
                        help="Credit threshold for account switching (default: $4.85)")
     args = parser.parse_args()
 
-    print("🚀 COMPLETE WORKFLOW SUPER SCRAPER - MODULAR VERSION")
-    print("=" * 60)
-    print("🔄 Website → Staff → LinkedIn → Patterns → AI → Send")
+    print("🚀 COMPLETE WORKFLOW SUPER SCRAPER - BULLETPROOF VERSION")
+    print("=" * 70)
+    print("🔄 Website → Staff → LinkedIn OR Website Fallback → Patterns → AI → Send")
     print(f"🧠 Features: Enhanced content analysis + Smart pattern learning")
+    print(f"🛡️ NEW: Bulletproof fallback for websites without LinkedIn")
     print(f"📧 Test mode: All emails go to dave@alpha-omegaltd.com")
     print(f"💰 Credit threshold: ${args.credit_threshold}")
-    print(f"🔥 NEW: Modular structure + Enhanced staff extraction")
+    print(f"🔥 BULLETPROOF: Works even if LinkedIn URL not found!")
     print()
 
     # Check environment variables
@@ -368,11 +397,18 @@ def main():
         results_file = scraper.save_results(results)
         
         # Final summary
-        print("\n🎉 COMPLETE WORKFLOW SUMMARY")
-        print("=" * 50)
+        print("\n🎉 BULLETPROOF WORKFLOW SUMMARY")
+        print("=" * 60)
         print(f"🌐 Website: {results['website_url']}")
         print(f"👥 Website staff found: {len(results['website_staff'])}")
         print(f"🔗 LinkedIn URL: {'✅ Found' if results['linkedin_url'] else '❌ Not found'}")
+        print(f"🛡️ Workflow path: {results.get('workflow_path', 'unknown').upper()}")
+        
+        if results.get('linkedin_employees'):
+            print(f"🔗 LinkedIn employees: {len(results['linkedin_employees'])}")
+        if results.get('fallback_contacts'):
+            print(f"🛡️ Fallback contacts: {len(results['fallback_contacts'])}")
+            
         print(f"📧 Fire protection emails sent: {len(results['emails_sent'])}")
         print(f"💾 Results saved: {results_file}")
         print(f"📬 Test emails sent to: dave@alpha-omegaltd.com")
@@ -380,7 +416,7 @@ def main():
         print()
         
         if results['status'] == 'completed':
-            print("✅ Complete workflow successful!")
+            print("✅ Bulletproof workflow successful!")
             
             if results['emails_sent']:
                 print("\n🎯 Fire Protection Targets Contacted:")
