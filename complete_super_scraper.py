@@ -30,7 +30,7 @@ Features:
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Union
 from pathlib import Path
-import csv, logging, sys, os, time, json, re, requests, random
+import csv, logging, sys, os, time, json, re, requests
 from urllib.parse import urlparse, urlunparse
 from datetime import datetime
 from dotenv import load_dotenv
@@ -577,7 +577,10 @@ class MillionVerifierManager:
                 
         except Exception as e:
             print(f"      ⚠️ MillionVerifier error for {email}: {e} - assuming valid")
-            return Trueclass ApifyAccountManager:
+            return True
+
+
+class ApifyAccountManager:                
     """Smart Apify account management with REAL-TIME credit monitoring and automatic switching"""
     
     def __init__(self):
@@ -1047,163 +1050,63 @@ class CompleteWorkflowSuperScraper:
             return 20
             
         # Default priority
-        return 30def _part2_native_linkedin_pipeline(self, linkedin_url: str, website_url: str) -> list:
-        """🔗 Part 2: NATIVE LinkedIn pipeline with ENHANCED PATTERN LEARNING + WEBSITE FALLBACK"""
+        
+        def _part2_native_linkedin_pipeline(self, linkedin_url: str, website_url: str) -> list:
+            """🔗 Part 2: NATIVE LinkedIn pipeline with ENHANCED PATTERN LEARNING + WEBSITE FALLBACK"""
         
         # Extract domain from website URL
-        import re
-        domain_match = re.search(r'https?://(?:www\.)?([^/]+)', website_url)
-        domain = domain_match.group(1) if domain_match else "unknown"
-        
-        print(f"\n🔗 PART 2: NATIVE LINKEDIN PIPELINE")
-        print(f"🎯 LinkedIn URL: {linkedin_url}")
-        print(f"🌐 Website: {website_url}")
-        print(f"📧 Domain: {domain}")
+        domain = urlparse(website_url).netloc.replace('www.', '')
         
         try:
-            # Get Apify client for Part 2
-            client = get_working_apify_client_part2()
-            if not client:
-                print("❌ No working Apify accounts available for Part 2")
-                return self._website_staff_fallback(website_url)
+            # Step 1: Native Actor 2 scraping with smart email discovery
+            print("\n🔍 STEP 1: NATIVE ACTOR 2 SCRAPING WITH SMART EMAIL DISCOVERY")
+            linkedin_contacts = self._native_scrape_linkedin_actor2(linkedin_url, domain)
             
-            run_input = {
-                "startUrls": [{"url": linkedin_url}],
-                "resultsLimit": 50,
-                "proxyConfiguration": {"useApifyProxy": True, "apifyProxyGroups": ["RESIDENTIAL"]},
-                "includeContactInfo": True
-            }
-            
-            print(f"🚀 Starting LinkedIn Actor...")
-            run = client.actor("shu8hvrXbJbY3Eb9W").call(run_input=run_input)
-            
-            if run["status"] != "SUCCEEDED":
-                print(f"❌ LinkedIn Actor failed: {run.get('status', 'Unknown error')}")
-                return self._website_staff_fallback(website_url)
-            
-            # Process results
-            dataset_items = []
-            for item in client.dataset(run["defaultDatasetId"]).iterate_items():
-                dataset_items.append(item)
-            
-            print(f"📊 LinkedIn Actor returned {len(dataset_items)} items")
-            
-            contacts = []
-            company_patterns = set()  # Track discovered patterns
-            
-            for item in dataset_items:
-                # Extract contact info
-                name = item.get('fullName') or item.get('name', '').strip()
-                if not name or len(name.split()) < 2:
-                    continue
+            if not linkedin_contacts:
+                print("❌ No employees found with Native Actor 2")
+                print("🔄 TRYING WEBSITE STAFF FALLBACK...")
                 
-                # Split name for email generation
-                name_parts = name.split()
-                first_name = name_parts[0]
-                last_name = name_parts[-1]
-                middle_name = " ".join(name_parts[1:-1]) if len(name_parts) > 2 else ""
-                
-                print(f"\n📧 DISCOVERING EMAIL FOR: {name}")
-                
-                # Test 33 golden patterns + pattern learning
-                discovered_email = None
-                highest_score = 0
-                
-                # Test all 33 golden email patterns
-                email_patterns = [
-                    f"{first_name.lower()}.{last_name.lower()}@{domain}",
-                    f"{first_name.lower()}{last_name.lower()}@{domain}",
-                    f"{first_name[0].lower()}.{last_name.lower()}@{domain}",
-                    f"{first_name[0].lower()}{last_name.lower()}@{domain}",
-                    f"{last_name.lower()}.{first_name.lower()}@{domain}",
-                    f"{last_name.lower()}{first_name.lower()}@{domain}",
-                    f"{first_name.lower()}_{last_name.lower()}@{domain}",
-                    f"{first_name.lower()}-{last_name.lower()}@{domain}",
-                    f"{last_name.lower()}_{first_name.lower()}@{domain}",
-                    f"{last_name.lower()}-{first_name.lower()}@{domain}",
-                    f"{first_name[0].lower()}_{last_name.lower()}@{domain}",
-                    f"{first_name[0].lower()}-{last_name.lower()}@{domain}",
-                    f"{last_name.lower()}_{first_name[0].lower()}@{domain}",
-                    f"{last_name.lower()}-{first_name[0].lower()}@{domain}",
-                    f"{first_name.lower()}@{domain}",
-                    f"{last_name.lower()}@{domain}",
-                    f"{first_name[0].lower()}{last_name[0].lower()}@{domain}",
-                    f"{last_name[0].lower()}{first_name[0].lower()}@{domain}",
-                    f"{first_name.lower()}{last_name[0].lower()}@{domain}",
-                    f"{last_name.lower()}{first_name[0].lower()}@{domain}",
-                    f"{first_name[0].lower()}.{last_name[0].lower()}@{domain}",
-                    f"{last_name[0].lower()}.{first_name[0].lower()}@{domain}",
-                    f"{first_name.lower()}.{last_name[0].lower()}@{domain}",
-                    f"{last_name.lower()}.{first_name[0].lower()}@{domain}",
-                    f"{first_name[0].lower()}_{last_name[0].lower()}@{domain}",
-                    f"{last_name[0].lower()}_{first_name[0].lower()}@{domain}",
-                    f"{first_name.lower()}_{last_name[0].lower()}@{domain}",
-                    f"{last_name.lower()}_{first_name[0].lower()}@{domain}",
-                    f"{first_name[0].lower()}-{last_name[0].lower()}@{domain}",
-                    f"{last_name[0].lower()}-{first_name[0].lower()}@{domain}",
-                    f"{first_name.lower()}-{last_name[0].lower()}@{domain}",
-                    f"{last_name.lower()}-{first_name[0].lower()}@{domain}",
-                    f"info@{domain}"
-                ]
-                
-                # Test patterns with priority scoring
-                for pattern in email_patterns:
-                    priority = self._calculate_pattern_test_priority(pattern)
-                    
-                    # Use MillionVerifier to check email
-                    is_valid = self.verifier.smart_verify_email(pattern)
-                    
-                    if is_valid:
-                        score = 100 + priority  # Base score + priority
-                        print(f"✅ VALID: {pattern} (Score: {score})")
-                        
-                        if score > highest_score:
-                            highest_score = score
-                            discovered_email = pattern
-                            
-                            # Learn this pattern for the company
-                            pattern_template = self._extract_pattern_template(pattern, first_name, last_name, domain)
-                            if pattern_template:
-                                company_patterns.add(pattern_template)
-                                print(f"🧠 LEARNED PATTERN: {pattern_template}")
-                    else:
-                        print(f"❌ Invalid: {pattern}")
-                
-                if discovered_email:
-                    print(f"🎯 SELECTED EMAIL: {discovered_email} (Score: {highest_score})")
-                    
-                    # Score contact for fire protection relevance
-                    position = item.get('position', '')
-                    description = item.get('description', '')
-                    fp_score = self._score_fire_protection_relevance(name, position, description)
-                    
-                    contact = {
-                        'name': name,
-                        'email': discovered_email,
-                        'position': position,
-                        'description': description,
-                        'linkedin_url': item.get('profileUrl', ''),
-                        'source': 'LinkedIn',
-                        'fire_protection_score': fp_score,
-                        'email_confidence': highest_score,
-                        'domain': domain
-                    }
-                    
-                    contacts.append(contact)
+                # NEW: Website staff fallback when Actor 2 fails
+                website_staff = self._website_staff_fallback(website_url)
+                if website_staff:
+                    print(f"✅ Found {len(website_staff)} staff from website fallback")
+                    linkedin_contacts = website_staff
                 else:
-                    print(f"❌ No valid email found for {name}")
+                    print("❌ Website fallback also failed")
+                    return []
             
-            # Apply learned patterns to contacts
-            if company_patterns:
-                print(f"\n🧠 APPLYING {len(company_patterns)} LEARNED PATTERNS TO ALL CONTACTS...")
-                contacts = self._apply_learned_patterns(contacts, company_patterns, domain)
+            # 🔥 NEW: Cooling-off period after pattern discovery
+            print("\n⏳ COOLING-OFF PERIOD: Waiting 2 seconds after pattern discovery...")
+            time.sleep(2)
             
-            print(f"\n✅ Part 2 completed: {len(contacts)} contacts with emails")
-            return contacts
+            # 🔥 NEW STEP 1.5: Apply learned pattern to ALL employees
+            if self.discovered_email_pattern:
+                print(f"\n🚀 STEP 1.5: APPLYING LEARNED PATTERN TO ALL EMPLOYEES")
+                linkedin_contacts = self._apply_pattern_to_all_employees(linkedin_contacts, domain)
+            
+            # Step 2: Native fire protection targeting (now with more verified emails)
+            print("\n🎯 STEP 2: NATIVE FIRE PROTECTION TARGETING")
+            fire_targets = self._native_score_fire_protection_targets(linkedin_contacts)
+            
+            # Step 3: Final email discovery for any remaining targets without emails
+            print("\n📧 STEP 3: FINAL EMAIL DISCOVERY WITH GOLDEN PATTERNS")
+            verified_contacts = self._native_discover_emails_golden_patterns(fire_targets, domain)
+            
+            if not verified_contacts:
+                print("❌ No verified email addresses found")
+                return []
+            
+            # Step 4: Native AI email generation and sending
+            print("\n🤖 STEP 4: NATIVE AI EMAIL GENERATION & SENDING")
+            sent_emails = self._native_generate_and_send_emails(verified_contacts, domain)
+            
+            return sent_emails
             
         except Exception as e:
-            print(f"❌ Part 2 error: {e}")
-            return self._website_staff_fallback(website_url)
+            print(f"❌ Native LinkedIn pipeline failed: {e}")
+            import traceback
+            traceback.print_exc()
+            return []
 
     def _website_staff_fallback(self, website_url: str) -> list:
         """🌐 Website staff fallback when Actor 2 fails"""
