@@ -193,36 +193,67 @@ class CompleteWorkflowSuperScraper:
             # PART 1: Website scraping (using normalized URL)
             print("📋 PART 1: WEBSITE SCRAPING")
             print("-" * 40)
-            website_staff, linkedin_url = self.website_scraper.scrape_website_for_staff_and_linkedin(normalized_url)
+            website_data = self.website_scraper.scrape_website_for_staff_and_linkedin(normalized_url)
+            
+            # Handle both old and new return formats
+            if isinstance(website_data, tuple):
+                website_staff, linkedin_url = website_data
+                fallback_contacts = []
+                fallback_emails = []
+            else:
+                website_staff = website_data.get('staff', [])
+                linkedin_url = website_data.get('linkedin_url', '')
+                fallback_contacts = website_data.get('fallback_contacts', [])
+                fallback_emails = website_data.get('fallback_emails', [])
             
             results['website_staff'] = website_staff
             results['linkedin_url'] = linkedin_url
+            results['fallback_contacts'] = fallback_contacts
+            results['fallback_emails'] = fallback_emails
             
-            if not linkedin_url:
-                print("❌ No LinkedIn URL found - cannot continue to Part 2")
-                results['status'] = 'failed_no_linkedin'
-                return results
+            print(f"✅ Part 1 complete: {len(website_staff)} staff + LinkedIn URL: {'Found' if linkedin_url else 'Not found'}")
             
-            print(f"✅ Part 1 complete: {len(website_staff)} staff + LinkedIn URL")
+            verified_contacts = []
             
-            # Cooling-off period before Part 2
-            print("\n⏳ COOLING-OFF PERIOD: Waiting 3 seconds before LinkedIn phase...")
-            time.sleep(3)
+            # Try LinkedIn pipeline first if URL available
+            if linkedin_url:
+                # Cooling-off period before Part 2
+                print("\n⏳ COOLING-OFF PERIOD: Waiting 3 seconds before LinkedIn phase...")
+                time.sleep(3)
+                
+                # PART 2: LinkedIn pipeline
+                print(f"\n🔗 PART 2: LINKEDIN PIPELINE")
+                print("-" * 40)
+                print(f"🏢 Using modular LinkedIn pipeline with advanced features")
+                print(f"✅ Features: Actor 2 + 33 Golden Patterns + Smart MillionVerifier + Pattern Learning")
+                
+                # Extract domain for LinkedIn processing
+                domain = urlparse(normalized_url).netloc.replace('www.', '')
+                try:
+                    verified_contacts = self.linkedin_scraper.scrape_linkedin_and_discover_emails(linkedin_url, domain)
+                except Exception as e:
+                    print(f"❌ LinkedIn pipeline failed: {e}")
+                    verified_contacts = []
             
-            # PART 2: LinkedIn pipeline
-            print(f"\n🔗 PART 2: LINKEDIN PIPELINE")
-            print("-" * 40)
-            print(f"🏢 Using modular LinkedIn pipeline with advanced features")
-            print(f"✅ Features: Actor 2 + 33 Golden Patterns + Smart MillionVerifier + Pattern Learning")
-            
-            # Extract domain for LinkedIn processing
-            domain = urlparse(normalized_url).netloc.replace('www.', '')
-            verified_contacts = self.linkedin_scraper.scrape_linkedin_and_discover_emails(linkedin_url, domain)
-            
+            # SMART FALLBACK: Use website data if LinkedIn failed or unavailable
             if not verified_contacts:
-                print("❌ No verified email addresses found")
-                results['status'] = 'failed_no_emails'
-                return results
+                print(f"\n🔄 PART 2B: SMART FALLBACK WORKFLOW")
+                print("-" * 40)
+                
+                if not linkedin_url:
+                    print("📋 Reason: No LinkedIn URL found")
+                else:
+                    print("📋 Reason: LinkedIn pipeline failed or returned no results")
+                    
+                print("🎯 Using captured website data for fire protection targeting")
+                
+                # Process fallback data
+                verified_contacts = self._process_fallback_data(fallback_contacts, fallback_emails, normalized_url)
+                
+                if not verified_contacts:
+                    print("❌ No contacts available from fallback data")
+                    results['status'] = 'failed_no_contacts'
+                    return results
             
             # 🔧 NEW: Remove duplicates and limit emails
             filtered_contacts = remove_duplicate_emails(verified_contacts, self.max_emails)
@@ -334,6 +365,158 @@ class CompleteWorkflowSuperScraper:
         print(f"   🎯 Duplicates prevented: Email limit enforced at {self.max_emails}")
         
         return sent_emails
+
+    def _process_fallback_data(self, fallback_contacts: list, fallback_emails: list, website_url: str) -> list:
+        """🔄 Process fallback data from website scraping when LinkedIn is unavailable"""
+        
+        print("🔄 PROCESSING SMART FALLBACK DATA")
+        print("=" * 50)
+        
+        domain = urlparse(website_url).netloc.replace('www.', '')
+        verified_contacts = []
+        
+        # Process captured contacts with emails
+        print(f"📊 Processing {len(fallback_contacts)} captured contacts...")
+        
+        for contact in fallback_contacts:
+            name = contact.get('name', '')
+            title = contact.get('title', '')
+            phone = contact.get('phone', '')
+            fire_relevance = contact.get('fire_protection_relevance', 'medium')
+            
+            print(f"   👤 Processing: {name} - {title}")
+            
+            # Try to match contact with appropriate email
+            contact_email = self._match_contact_to_email(contact, fallback_emails, domain)
+            
+            if contact_email:
+                print(f"   📧 Email matched: {contact_email}")
+                
+                # Verify email
+                if self.millionverifier.smart_verify_email(contact_email, domain):
+                    # Calculate fire protection score
+                    fire_score = self._calculate_fallback_fire_score(title, fire_relevance)
+                    
+                    verified_contact = {
+                        'name': name,
+                        'title': title,
+                        'email': contact_email,
+                        'phone': phone,
+                        'fire_protection_score': fire_score,
+                        'fire_protection_reason': self._get_fire_protection_reason(title),
+                        'source': 'smart_fallback',
+                        'email_source': 'website_capture',
+                        'verification_status': 'verified',
+                        'priority': self._determine_priority_from_title(title)
+                    }
+                    
+                    verified_contacts.append(verified_contact)
+                    print(f"   ✅ Contact verified: {name} (Score: {fire_score})")
+                else:
+                    print(f"   ❌ Email verification failed: {contact_email}")
+            else:
+                print(f"   ⚠️ No suitable email found for: {name}")
+        
+        # Sort by fire protection score and limit
+        verified_contacts.sort(key=lambda x: x.get('fire_protection_score', 0), reverse=True)
+        limited_contacts = verified_contacts[:self.max_emails]
+        
+        print(f"\n🎯 SMART FALLBACK RESULTS:")
+        print(f"   📊 Contacts processed: {len(fallback_contacts)}")
+        print(f"   ✅ Verified contacts: {len(verified_contacts)}")
+        print(f"   📧 Final selection: {len(limited_contacts)} (limited by max_emails)")
+        
+        return limited_contacts
+    
+    def _match_contact_to_email(self, contact: dict, fallback_emails: list, domain: str) -> str:
+        """🎯 Match a contact to the most appropriate email address"""
+        
+        name = contact.get('name', '').lower()
+        title = contact.get('title', '').lower()
+        
+        # Remove duplicates from emails
+        unique_emails = list(set(fallback_emails))
+        
+        # Try to find personalized email first
+        for email in unique_emails:
+            email_local = email.split('@')[0].lower()
+            
+            # Check if email contains person's name
+            name_parts = name.split()
+            if len(name_parts) >= 2:
+                first_name = name_parts[0]
+                last_name = name_parts[-1]
+                
+                if (first_name in email_local or 
+                    last_name in email_local or
+                    f"{first_name}.{last_name}" in email_local or
+                    f"{first_name}{last_name}" in email_local):
+                    return email
+        
+        # Fall back to role-based emails
+        if 'director' in title or 'manager' in title or 'operations' in title:
+            for email in unique_emails:
+                if email != f"info@{domain}":  # Prefer non-generic emails for managers
+                    return email
+        
+        # Final fallback - use first available email
+        return unique_emails[0] if unique_emails else None
+    
+    def _calculate_fallback_fire_score(self, title: str, relevance: str) -> int:
+        """🔥 Calculate fire protection score for fallback contacts"""
+        
+        title_lower = title.lower()
+        base_score = 50
+        
+        # Title-based scoring
+        if 'director' in title_lower:
+            base_score += 30
+        elif 'manager' in title_lower:
+            base_score += 25
+        elif 'technical' in title_lower:
+            base_score += 20
+        elif 'operations' in title_lower:
+            base_score += 25
+        
+        # Relevance-based scoring
+        if relevance == 'high':
+            base_score += 20
+        elif relevance == 'medium':
+            base_score += 10
+        
+        # Fire safety related keywords
+        if any(keyword in title_lower for keyword in ['safety', 'compliance', 'facilities', 'health']):
+            base_score += 15
+        
+        return min(base_score, 100)  # Cap at 100
+    
+    def _get_fire_protection_reason(self, title: str) -> str:
+        """📋 Get fire protection responsibility reason based on title"""
+        
+        title_lower = title.lower()
+        
+        if 'director' in title_lower and 'operations' in title_lower:
+            return "Operations Director - oversees all operational safety including fire protection systems"
+        elif 'technical' in title_lower and 'manager' in title_lower:
+            return "Technical Manager - responsible for technical compliance including fire safety systems"
+        elif 'director' in title_lower:
+            return "Director-level responsibility for workplace safety and compliance"
+        elif 'manager' in title_lower:
+            return "Management responsibility for operational safety procedures"
+        else:
+            return "Key contact for business fire safety and compliance requirements"
+    
+    def _determine_priority_from_title(self, title: str) -> str:
+        """📊 Determine priority level from job title"""
+        
+        title_lower = title.lower()
+        
+        if any(keyword in title_lower for keyword in ['director', 'ceo', 'owner', 'founder']):
+            return 'high'
+        elif any(keyword in title_lower for keyword in ['manager', 'head', 'lead']):
+            return 'medium'
+        else:
+            return 'standard'
 
     def save_results(self, results: dict) -> str:
         """💾 Save comprehensive workflow results to output folder"""
