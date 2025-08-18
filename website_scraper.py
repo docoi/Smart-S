@@ -1,7 +1,8 @@
 """
-🌐 Smart Website Scraper Module
-==============================
-Captures ALL useful data in Part 1 - no re-scraping needed!
+🌐 Website Scraper Module
+========================
+Handles website scraping, staff extraction, LinkedIn URL discovery, and Smart Fallback
+✅ UPDATED: Now includes Smart Fallback functionality for when LinkedIn is unavailable
 """
 
 import json
@@ -11,34 +12,25 @@ from account_manager import get_working_apify_client_part1
 
 
 class WebsiteScraper:
-    """🌐 Smart website scraping - capture everything once in Part 1"""
+    """🌐 Website scraping with GPT-4o analysis and Smart Fallback"""
     
     def __init__(self, openai_key):
         self.openai_key = openai_key
-        # Store fallback data from Part 1
-        self.fallback_contact_data = {
-            'emails_found': [],
-            'contact_info': [],
-            'all_content': '',
-            'domain': ''
-        }
     
-    def scrape_website_for_staff_and_linkedin(self, website_url: str) -> tuple:
-        """📋 SMART: Scrape website once and capture ALL useful data for later use"""
+    def scrape_website_for_staff_and_linkedin(self, website_url: str) -> dict:
+        """📋 Main method: Scrape website for staff, LinkedIn URL, and Smart Fallback data"""
         
         print(f"🗺️ Phase 1a: Website mapping...")
         
-        # Normalize URL and extract domain
+        # Normalize URL
         normalized_url = self._normalize_www(website_url)
-        domain = urlparse(website_url).netloc.replace('www.', '')
-        self.fallback_contact_data['domain'] = domain
         
         # Map website to find URLs using account rotation
         website_map = self._stealth_website_mapping(normalized_url)
         
         if not website_map:
             print("❌ Website mapping failed")
-            return [], ""
+            return {'staff': [], 'linkedin_url': '', 'fallback_contacts': [], 'fallback_emails': []}
         
         print(f"🧠 Phase 1b: GPT-4o URL analysis...")
         
@@ -47,108 +39,66 @@ class WebsiteScraper:
         
         if not selected_urls:
             print("❌ No URLs selected for analysis")
-            return [], ""
+            return {'staff': [], 'linkedin_url': '', 'fallback_contacts': [], 'fallback_emails': []}
         
         print(f"🔍 Phase 1c: SMART content analysis - capturing ALL data...")
         
-        # 🧠 SMART: Extract staff, LinkedIn, AND capture fallback data
-        staff_list, social_data = self._extract_staff_and_capture_fallback_data(selected_urls, domain)
+        # Extract staff and LinkedIn from selected URLs using account rotation
+        staff_list, social_data, all_content = self._extract_staff_and_social_with_content(selected_urls)
         
         # Find LinkedIn URL
         linkedin_url = (social_data.get('company_linkedin') or 
                        social_data.get('linkedin') or 
                        social_data.get('LinkedIn') or "")
         
+        # 🔥 NEW: Smart Fallback - Extract emails and contacts for fallback
+        fallback_emails, fallback_contacts = self._smart_fallback_extraction(all_content, normalized_url)
+        
         print(f"✅ Website scraping complete:")
         print(f"   👥 Staff found: {len(staff_list)}")
-        print(f"   🔗 LinkedIn URL: {linkedin_url[:50]}..." if linkedin_url else "   ❌ No LinkedIn URL found")
-        print(f"   📧 Fallback emails captured: {len(self.fallback_contact_data['emails_found'])}")
-        print(f"   👤 Fallback contacts captured: {len(self.fallback_contact_data['contact_info'])}")
+        if linkedin_url:
+            print(f"   🔗 LinkedIn URL: {linkedin_url[:50]}...")
+        else:
+            print(f"   ❌ No LinkedIn URL found")
+        print(f"   📧 Fallback emails captured: {len(fallback_emails)}")
+        print(f"   👤 Fallback contacts captured: {len(fallback_contacts)}")
         print(f"   💾 Fallback data ready for later use if needed")
         
-        return staff_list, linkedin_url
+        return {
+            'staff': staff_list,
+            'linkedin_url': linkedin_url,
+            'fallback_contacts': fallback_contacts,
+            'fallback_emails': fallback_emails
+        }
 
-    def get_fallback_contacts(self) -> list:
-        """🛡️ Return pre-captured fallback contact data (no re-scraping needed!)"""
-        
-        print("\n🛡️ USING PRE-CAPTURED FALLBACK DATA")
-        print("🎯 Strategy: Use contact data already captured in Part 1")
-        print("✅ No re-scraping needed - data already available!")
-        print("=" * 70)
-        
-        domain = self.fallback_contact_data['domain']
-        emails_found = self.fallback_contact_data['emails_found']
-        contact_info = self.fallback_contact_data['contact_info']
-        
-        if not emails_found and not contact_info:
-            print("❌ No fallback contact data available")
-            return []
-        
-        print(f"📧 Using {len(emails_found)} pre-captured emails")
-        print(f"👤 Using {len(contact_info)} pre-captured contacts")
-        
-        # Generate emails for discovered contacts using pre-captured data
-        discovered_contacts = self._generate_emails_for_captured_contacts(
-            contact_info, emails_found, domain
-        )
-        
-        # Score contacts for fire protection relevance
-        scored_contacts = self._score_website_contacts_fire_protection(discovered_contacts)
-        
-        print(f"\n📊 FALLBACK RESULTS FROM PRE-CAPTURED DATA:")
-        print(f"   📧 Direct emails: {len(emails_found)}")
-        print(f"   👥 Named contacts: {len(contact_info)}")
-        print(f"   ✅ Total verified contacts: {len(scored_contacts)}")
-        
-        return scored_contacts
-
-    def _extract_staff_and_capture_fallback_data(self, urls: list, domain: str) -> tuple:
-        """🧠 SMART: Extract staff AND capture all contact data for later fallback use"""
+    def _extract_staff_and_social_with_content(self, urls: list) -> tuple:
+        """🔍 Extract staff, social media, and content from selected URLs"""
         
         all_staff = []
         all_social = {}
-        all_content_combined = ""
+        all_content = ""
         
         for i, url in enumerate(urls, 1):
             print(f"  📄 Processing {i}/{len(urls)}: {url}")
             
             try:
-                staff, social, content = self._analyze_single_url_with_content_capture(url)
+                staff, social, content = self._analyze_single_url_with_content(url)
                 all_staff.extend(staff)
                 all_social.update(social)
-                
-                # 🧠 SMART: Accumulate ALL content for fallback analysis
-                if content:
-                    all_content_combined += f"\n\n=== CONTENT FROM {url} ===\n{content}"
+                all_content += content + "\n\n"
                 
                 if staff:
                     print(f"    ✅ Found {len(staff)} staff members")
                 
             except Exception as e:
                 print(f"    ⚠️ Error: {e}")
-        
-        # 🧠 SMART: Now analyze ALL captured content for fallback contacts
-        print(f"\n🧠 SMART ANALYSIS: Extracting fallback data from {len(all_content_combined)} characters")
-        self.fallback_contact_data['all_content'] = all_content_combined
-        
-        # Extract emails from all content
-        emails_found = self._extract_emails_from_content(all_content_combined)
-        self.fallback_contact_data['emails_found'] = emails_found
-        
-        # Extract contact information using GPT-4o-mini
-        contact_info = self._extract_contact_info_gpt(all_content_combined, domain)
-        self.fallback_contact_data['contact_info'] = contact_info
-        
-        print(f"✅ SMART CAPTURE COMPLETE:")
-        print(f"   📧 Emails captured for fallback: {len(emails_found)}")
-        print(f"   👤 Contacts captured for fallback: {len(contact_info)}")
-        
-        return all_staff, all_social
+                
+        return all_staff, all_social, all_content
 
-    def _analyze_single_url_with_content_capture(self, url: str) -> tuple:
-        """🔍 Analyze single URL and return content for fallback analysis"""
+    def _analyze_single_url_with_content(self, url: str) -> tuple:
+        """🔍 Analyze single URL for staff, social media, and capture content"""
         
-        # JavaScript function that captures MORE content
+        # Enhanced JavaScript function to capture more data
         page_function = """
         async function pageFunction(context) {
             const { request, log, jQuery } = context;
@@ -200,7 +150,9 @@ class WebsiteScraper:
         }
         
         try:
+            # Get client with credit-based account rotation for Part 1
             client = get_working_apify_client_part1()
+            
             run = client.actor("apify~web-scraper").call(run_input=payload)
             
             if run:
@@ -212,7 +164,6 @@ class WebsiteScraper:
                     # Analyze content with GPT-4o for staff
                     staff = self._gpt_extract_staff(content, url)
                     
-                    # 🧠 SMART: Return content for fallback analysis
                     return staff, social, content
             
             return [], {}, ""
@@ -221,102 +172,97 @@ class WebsiteScraper:
             print(f"    ❌ Content analysis failed: {e}")
             return [], {}, ""
 
-    def _extract_emails_from_content(self, content: str) -> list:
-        """📧 Extract email addresses directly from website content"""
+    def _smart_fallback_extraction(self, all_content: str, website_url: str) -> tuple:
+        """🔄 Smart Fallback: Extract emails and contacts from captured content"""
         
-        if not content:
-            return []
+        print(f"\n🧠 SMART ANALYSIS: Extracting fallback data from {len(all_content)} characters")
         
-        print("🔍 Extracting emails from captured content...")
+        # Extract emails using regex
+        fallback_emails = self._extract_emails_from_content(all_content, website_url)
         
-        # Email regex patterns
-        email_patterns = [
-            r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
-            r'\b[A-Za-z0-9._%+-]+\s*@\s*[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
-            r'mailto:([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,})',
-        ]
+        # Extract contacts using GPT-4o-mini
+        fallback_contacts = self._extract_contacts_gpt(all_content, website_url)
         
-        found_emails = set()
+        print(f"✅ SMART CAPTURE COMPLETE:")
+        print(f"   📧 Emails captured for fallback: {len(set(fallback_emails))}")
+        print(f"   👤 Contacts captured for fallback: {len(fallback_contacts)}")
         
-        for pattern in email_patterns:
-            matches = re.findall(pattern, content, re.IGNORECASE)
-            for match in matches:
-                if isinstance(match, tuple):
-                    email = match[0]  # For mailto: pattern
-                else:
-                    email = match
-                
-                # Clean and validate email
-                email = email.strip().lower()
-                if self._is_valid_business_email(email):
-                    found_emails.add(email)
-                    print(f"   📧 Captured email: {email}")
+        # Remove duplicates from emails
+        unique_emails = list(set(fallback_emails))
         
-        return list(found_emails)
+        return unique_emails, fallback_contacts
 
-    def _is_valid_business_email(self, email: str) -> bool:
-        """Validate if email looks like a business email"""
+    def _extract_emails_from_content(self, content: str, website_url: str) -> list:
+        """📧 Extract email addresses from content"""
         
-        # Skip obvious spam/fake emails
-        spam_keywords = ['noreply', 'no-reply', 'donotreply', 'example', 'test', 'spam']
-        if any(keyword in email.lower() for keyword in spam_keywords):
-            return False
+        print(f"🔍 Extracting emails from captured content...")
         
-        # Basic email format validation
-        if '@' not in email or '.' not in email.split('@')[1]:
-            return False
+        domain = urlparse(website_url).netloc.replace('www.', '')
         
-        return True
-
-    def _extract_contact_info_gpt(self, content: str, domain: str) -> list:
-        """🧠 Use GPT-4o-mini to extract contact information from website content"""
+        # Email regex pattern
+        email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        emails = re.findall(email_pattern, content)
         
-        if len(content) < 1000:
-            print("⚠️ Insufficient content for GPT analysis")
-            return []
+        # Filter for relevant emails (same domain preferred)
+        relevant_emails = []
+        other_emails = []
         
-        prompt = f"""Analyze this website content and extract ALL possible contact information for business decision-makers.
+        for email in emails:
+            email = email.lower().strip()
+            if domain in email:
+                relevant_emails.append(email)
+                print(f"   📧 Captured email: {email}")
+            else:
+                other_emails.append(email)
+        
+        # Prefer domain emails, but include others if needed
+        final_emails = relevant_emails + other_emails[:3]  # Limit other emails
+        
+        return final_emails
 
-WEBSITE: {domain}
+    def _extract_contacts_gpt(self, content: str, website_url: str) -> list:
+        """👤 Extract contact information using GPT-4o-mini"""
+        
+        domain = urlparse(website_url).netloc.replace('www.', '')
+        
+        # Limit content to avoid token limits
+        limited_content = content[:50000]  # 50K chars should be safe
+        
+        prompt = f"""Extract key business contacts from this website content for {domain}.
 
-EXTRACT:
-1. Names of people (owners, managers, directors, key staff)
-2. Job titles/roles
-3. Phone numbers
-4. Any contact information
-5. Department heads or key contacts
+IMPORTANT: Find people who would be responsible for fire safety, building management, or business operations.
 
-RULES:
-- Focus on decision-makers who would handle fire safety/building compliance
-- Include owners, managers, facilities managers, operations staff
-- Exclude obvious clients, testimonials, or external people
-- Include anyone who might make purchasing decisions
+Look for:
+- Names with job titles
+- Phone numbers associated with people
+- People in management, operations, technical, or director roles
+- Department heads or facility managers
 
-Return as JSON:
+Return as JSON array:
 [
   {{
     "name": "Full Name",
-    "title": "Job Title", 
-    "phone": "Phone if found",
-    "department": "Department if mentioned",
-    "role_type": "owner/manager/director/staff",
+    "title": "Job Title",
+    "phone": "Phone Number (if found)",
+    "department": "Department (if found)",
+    "role_type": "manager/director/technical/operations",
     "fire_protection_relevance": "high/medium/low"
   }}
 ]
 
-If no contacts found: []
+If no clear contacts found, return []
 
-CONTENT:
-{content[:150000]}"""  # Use substantial content for analysis
+Content:
+{limited_content}"""
 
         try:
             from openai import OpenAI
             client = OpenAI(api_key=self.openai_key)
             
             response = client.chat.completions.create(
-                model="gpt-4o-mini",  # Cost-effective for this analysis
+                model="gpt-4o-mini",
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=2000,
+                max_tokens=1000,
                 temperature=0.1
             )
             
@@ -324,7 +270,7 @@ CONTENT:
             
             print(f"\n🧠 GPT-4o-mini CONTACT ANALYSIS:")
             print("-" * 60)
-            print(result_text[:500] + "..." if len(result_text) > 500 else result_text)
+            print(result_text)
             print("-" * 60)
             
             # Parse JSON
@@ -338,281 +284,17 @@ CONTENT:
                 print(f"✅ GPT-4o-mini captured {len(contacts)} potential contacts")
                 for contact in contacts:
                     name = contact.get('name', 'Unknown')
-                    title = contact.get('title', 'Unknown')
-                    relevance = contact.get('fire_protection_relevance', 'unknown')
+                    title = contact.get('title', 'Unknown Role')
+                    relevance = contact.get('fire_protection_relevance', 'medium')
                     print(f"   👤 {name} - {title} (Relevance: {relevance})")
                 
                 return contacts
                 
         except Exception as e:
-            print(f"⚠️ GPT contact extraction failed: {e}")
+            print(f"   ⚠️ GPT contact extraction failed: {e}")
         
         return []
 
-    def _generate_emails_for_captured_contacts(self, contact_info: list, found_emails: list, domain: str) -> list:
-        """🧪 ENHANCED: Generate and verify emails for captured contacts with smart matching"""
-        
-        from account_manager import MillionVerifierManager
-        millionverifier = MillionVerifierManager()
-        
-        verified_contacts = []
-        
-        # 🧠 SMART MATCHING: Match found emails with discovered contacts
-        print(f"\n🧠 SMART CONTACT MATCHING:")
-        print(f"   📧 Found emails: {found_emails}")
-        print(f"   👤 Discovered contacts: {[c.get('name', 'Unknown') for c in contact_info]}")
-        
-        # First, try to match direct emails with discovered contacts
-        for email in found_emails:
-            print(f"\n📧 Processing direct email: {email}")
-            
-            # ✅ IMPROVEMENT 1: Verify email with MillionVerifier
-            print(f"   🔍 Verifying email with MillionVerifier...")
-            if not millionverifier.smart_verify_email(email, domain):
-                print(f"   ❌ Email failed verification: {email}")
-                continue
-            
-            # ✅ IMPROVEMENT 2: Smart contact matching
-            matched_contact = self._match_email_to_contact(email, contact_info, domain)
-            
-            if matched_contact:
-                contact = {
-                    'name': matched_contact.get('name', 'Contact Person'),
-                    'title': matched_contact.get('title', 'Contact Person'),
-                    'email': email,
-                    'phone': matched_contact.get('phone', ''),
-                    'role_type': matched_contact.get('role_type', 'staff'),
-                    'email_source': 'direct_extraction_verified',
-                    'verification_status': 'verified',
-                    'fire_protection_relevance': matched_contact.get('fire_protection_relevance', 'medium')
-                }
-                verified_contacts.append(contact)
-                print(f"   ✅ SMART MATCH: {email} → {matched_contact.get('name')} ({matched_contact.get('title')})")
-            else:
-                # Use generic contact info for unmatched emails
-                contact = {
-                    'name': self._extract_name_from_email(email),
-                    'title': 'Contact Person',
-                    'email': email,
-                    'email_source': 'direct_extraction_verified',
-                    'verification_status': 'verified',
-                    'fire_protection_relevance': 'medium'
-                }
-                verified_contacts.append(contact)
-                print(f"   ✅ Email verified but no contact match: {email}")
-        
-        # Then, generate emails for named contacts without direct emails
-        unmatched_contacts = [c for c in contact_info if not self._contact_has_direct_email(c, found_emails)]
-        
-        for contact in unmatched_contacts:
-            name = contact.get('name', '')
-            if not name or len(name.split()) < 2:
-                continue
-            
-            name_parts = name.split()
-            first_name = name_parts[0]
-            last_name = name_parts[-1]
-            middle_name = " ".join(name_parts[1:-1]) if len(name_parts) > 2 else ""
-            
-            print(f"\n🧪 Generating emails for unmatched contact: {name}")
-            
-            # Generate common email patterns
-            email_patterns = self._generate_common_email_patterns(first_name, last_name, domain, middle_name)
-            
-            email_found = False
-            for i, test_email in enumerate(email_patterns, 1):
-                print(f"   🔍 Testing pattern {i}/{len(email_patterns)}: {test_email}")
-                
-                if millionverifier.smart_verify_email(test_email, domain):
-                    print(f"   ✅ EMAIL VERIFIED: {test_email}")
-                    
-                    contact['email'] = test_email
-                    contact['email_source'] = f'generated_pattern_{i}'
-                    contact['verification_status'] = 'verified'
-                    verified_contacts.append(contact)
-                    email_found = True
-                    break
-                else:
-                    print(f"   ❌ Pattern failed: {test_email}")
-            
-            if not email_found:
-                print(f"   😞 No valid email found for {name}")
-        
-        return verified_contacts
-
-    def _match_email_to_contact(self, email: str, contact_info: list, domain: str) -> dict:
-        """🧠 SMART: Match a direct email to a discovered contact person"""
-        
-        if not contact_info:
-            return None
-        
-        email_local = email.split('@')[0].lower()
-        
-        # Strategy 1: Look for generic emails that should match with decision makers
-        generic_emails = ['staff', 'info', 'contact', 'admin', 'office', 'hello']
-        
-        if any(generic in email_local for generic in generic_emails):
-            # For generic emails, prefer owners/managers over regular staff
-            priority_contacts = []
-            
-            for contact in contact_info:
-                role_type = contact.get('role_type', '').lower()
-                title = contact.get('title', '').lower()
-                
-                # Prioritize decision makers for generic emails
-                if role_type in ['owner', 'director', 'manager']:
-                    priority_contacts.append(contact)
-                elif any(keyword in title for keyword in ['owner', 'director', 'manager', 'ceo', 'md']):
-                    priority_contacts.append(contact)
-            
-            if priority_contacts:
-                # Return the highest priority contact
-                best_contact = priority_contacts[0]
-                print(f"   🎯 SMART MATCH: Generic email '{email}' matched to decision maker '{best_contact.get('name')}'")
-                return best_contact
-            else:
-                # Return first available contact if no decision makers found
-                return contact_info[0] if contact_info else None
-        
-        # Strategy 2: Look for name-based matches
-        for contact in contact_info:
-            name = contact.get('name', '').lower()
-            first_name = name.split()[0] if name.split() else ''
-            
-            if first_name and first_name in email_local:
-                print(f"   🎯 NAME MATCH: Email '{email}' matched to '{contact.get('name')}' by first name")
-                return contact
-        
-        # Strategy 3: For any other emails, return the most relevant contact
-        if contact_info:
-            # Prefer decision makers
-            for contact in contact_info:
-                role_type = contact.get('role_type', '').lower()
-                if role_type in ['owner', 'director', 'manager']:
-                    print(f"   🎯 DEFAULT MATCH: Email '{email}' matched to decision maker '{contact.get('name')}'")
-                    return contact
-            
-            # Otherwise return first contact
-            print(f"   🎯 FALLBACK MATCH: Email '{email}' matched to '{contact_info[0].get('name')}'")
-            return contact_info[0]
-        
-        return None
-
-    def _contact_has_direct_email(self, contact: dict, found_emails: list) -> bool:
-        """Check if a contact already has a direct email match"""
-        name = contact.get('name', '').lower()
-        first_name = name.split()[0] if name.split() else ''
-        
-        for email in found_emails:
-            email_local = email.split('@')[0].lower()
-            if first_name and first_name in email_local:
-                return True
-        
-        return False
-
-    def _generate_common_email_patterns(self, first_name: str, last_name: str, domain: str, middle_name: str = "") -> list:
-        """Generate common email patterns for business contacts"""
-        
-        first = first_name.lower().strip()
-        last = last_name.lower().strip()
-        f = first[0] if first else ''
-        l = last[0] if last else ''
-        
-        patterns = [
-            f"{first}@{domain}",
-            f"{last}@{domain}",
-            f"{first}.{last}@{domain}",
-            f"{f}{last}@{domain}",
-            f"{first}{last}@{domain}",
-            f"{f}.{last}@{domain}",
-            f"{last}.{first}@{domain}",
-            f"{first}_{last}@{domain}",
-            f"{first}-{last}@{domain}",
-            f"{first}{l}@{domain}",
-            f"{f}{l}@{domain}"
-        ]
-        
-        # Remove duplicates
-        return list(dict.fromkeys(patterns))
-
-    def _extract_name_from_email(self, email: str) -> str:
-        """Extract a name from an email address"""
-        local_part = email.split('@')[0]
-        
-        # Handle common separators
-        if '.' in local_part:
-            parts = local_part.split('.')
-            return ' '.join(part.capitalize() for part in parts if len(part) > 1)
-        elif '_' in local_part:
-            parts = local_part.split('_')
-            return ' '.join(part.capitalize() for part in parts if len(part) > 1)
-        elif '-' in local_part:
-            parts = local_part.split('-')
-            return ' '.join(part.capitalize() for part in parts if len(part) > 1)
-        else:
-            return local_part.capitalize()
-
-    def _score_website_contacts_fire_protection(self, contacts: list) -> list:
-        """🔥 ENHANCED: Score website contacts for fire protection relevance with better owner scoring"""
-        
-        for contact in contacts:
-            title = contact.get('title', '').lower()
-            name = contact.get('name', '').lower()
-            role_type = contact.get('role_type', '').lower()
-            existing_relevance = contact.get('fire_protection_relevance', 'low')
-            
-            score = 0
-            reason = 'General contact'
-            
-            # 🔥 ENHANCED: Much higher scores for business owners and decision makers
-            if role_type in ['owner', 'director'] or 'owner' in title:
-                score += 95
-                reason = 'Business owner - ultimate responsibility for fire safety compliance and purchasing decisions'
-            elif role_type in ['manager'] or any(keyword in title for keyword in ['manager', 'director', 'ceo', 'md']):
-                score += 85
-                reason = 'Management role - budget authority and responsibility for safety investments'
-            
-            # Score based on title keywords (enhanced)
-            if any(keyword in title for keyword in ['facilities', 'operations', 'maintenance', 'building']):
-                score += 100
-                reason = 'Facilities/Operations role - direct building safety responsibility'
-            elif any(keyword in title for keyword in ['safety', 'compliance', 'risk', 'health']):
-                score += 100
-                reason = 'Safety role - direct fire protection responsibility'
-            elif any(keyword in title for keyword in ['ceo', 'managing director', 'founder']):
-                score += 90
-                reason = 'Senior leadership - ultimate compliance and purchasing authority'
-            
-            # 🔥 ENHANCED: Boost for decision makers with generic emails (like staff@company.com)
-            email = contact.get('email', '')
-            email_source = contact.get('email_source', '')
-            if 'direct_extraction' in email_source and any(keyword in email for keyword in ['staff', 'info', 'contact']):
-                if score >= 80:  # Only boost if already a decision maker
-                    score += 10
-                    reason += ' (reached via main business contact)'
-            
-            # Boost score based on existing GPT relevance assessment
-            if existing_relevance == 'high':
-                score += 20
-            elif existing_relevance == 'medium':
-                score += 10
-            
-            # 🔥 ENHANCED: Minimum score for any business contact
-            if score < 30:
-                score = 30
-                reason = 'Business contact - potential fire safety decision involvement'
-            
-            contact['fire_protection_score'] = score
-            contact['fire_protection_reason'] = reason
-            
-            print(f"   🔥 {contact['name']} ({contact.get('title', 'Unknown')}) - Score: {score}")
-            print(f"      Reason: {reason}")
-        
-        # Sort by score and return top contacts
-        contacts.sort(key=lambda x: x.get('fire_protection_score', 0), reverse=True)
-        return contacts
-
-    # Keep existing methods for regular LinkedIn flow
     def _stealth_website_mapping(self, url: str) -> dict:
         """🗺️ Stealth website mapping using Apify with account rotation"""
         
@@ -669,7 +351,9 @@ async function pageFunction(context) {
         }
         
         try:
+            # Get client with credit-based account rotation for Part 1
             client = get_working_apify_client_part1()
+            
             run = client.actor("apify~web-scraper").call(run_input=payload)
             
             if run:
@@ -765,11 +449,6 @@ Focus on: about, team, staff, people, contact, leadership pages."""
             return []
         
         domain = urlparse(url).netloc.replace('www.', '')
-        
-        # 🔥 NEW: Extract staff-related sections first
-        staff_content = self._extract_staff_sections(content)
-        if staff_content:
-            content = staff_content
         
         prompt = f"""Extract staff from this {domain} content.
 
