@@ -2,6 +2,7 @@
 🔗 LinkedIn Scraper Module
 =========================
 Handles LinkedIn employee scraping, email pattern discovery, and email verification
+✅ UPDATED: Now properly respects email limits from main.py
 """
 
 import time
@@ -20,7 +21,7 @@ class LinkedInScraper:
         self.discovered_email_pattern = None
         self.discovered_pattern_index = None
     
-    def scrape_linkedin_and_discover_emails(self, linkedin_url: str, domain: str) -> list:
+    def scrape_linkedin_and_discover_emails(self, linkedin_url: str, domain: str, max_targets: int = 2) -> list:
         """🔍 Main method: Scrape LinkedIn and discover emails with pattern learning"""
         
         try:
@@ -41,9 +42,9 @@ class LinkedInScraper:
                 print(f"\n🚀 STEP 1.5: APPLYING LEARNED PATTERN TO ALL EMPLOYEES")
                 linkedin_contacts = self._apply_pattern_to_all_employees(linkedin_contacts, domain)
             
-            # Step 2: Fire protection targeting
+            # Step 2: Fire protection targeting (with proper limit)
             print("\n🎯 STEP 2: FIRE PROTECTION TARGETING")
-            fire_targets = self._score_fire_protection_targets(linkedin_contacts)
+            fire_targets = self._score_fire_protection_targets(linkedin_contacts, max_targets)
             
             # Step 3: Final email discovery for any remaining targets without emails
             print("\n📧 STEP 3: FINAL EMAIL DISCOVERY WITH GOLDEN PATTERNS")
@@ -413,7 +414,7 @@ Answer with exactly one word: PERSON or COMPANY"""
         return linkedin_contacts
 
     def _score_fire_protection_targets(self, linkedin_contacts: list, max_targets: int = 2) -> list:
-        """🎯 Fire protection targeting from verified emails"""
+        """🎯 Fire protection targeting from verified emails with proper limit enforcement"""
         
         print("🔥 FIRE PROTECTION CONTACT IDENTIFICATION")
         print(f"🎯 Target: {max_targets} most relevant fire protection decision-makers")
@@ -483,14 +484,17 @@ Answer with exactly one word: PERSON or COMPANY"""
             
             print(f"   📊 {contact['name']} - {contact['title']} | Score: {best_score} | {contact['email']} | {best_reason}")
         
-        # Sort by score and select top targets
+        # Sort by score and select top targets (properly enforce limit here)
         scored_contacts.sort(key=lambda x: x['fire_protection_score'], reverse=True)
-        fire_targets = scored_contacts[:max_targets]
+        fire_targets = scored_contacts[:max_targets]  # 🔧 FIXED: Properly limit here
         
         print(f"\n🎯 TOP {max_targets} FIRE PROTECTION TARGETS SELECTED:")
         for i, target in enumerate(fire_targets, 1):
             print(f"   {i}. {target['name']} - {target['title']}")
             print(f"      Score: {target['fire_protection_score']} | Email: {target['email']} | {target['fire_protection_reason']}")
+        
+        if len(scored_contacts) > max_targets:
+            print(f"\n📊 Note: {len(scored_contacts) - max_targets} additional contacts were found but limited by max_targets={max_targets}")
         
         return fire_targets
 
