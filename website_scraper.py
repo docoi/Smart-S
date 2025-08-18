@@ -5,6 +5,7 @@ Handles website scraping, staff extraction, LinkedIn URL discovery, and Smart Fa
 ✅ FIXED: LinkedIn URL extraction with GPT-4o social media finder
 ✅ FIXED: Smart Fallback functionality for when LinkedIn fails
 ✅ FIXED: Returns dict format for compatibility with main.py
+✅ FIXED: Email extraction and cleaning
 """
 
 import json
@@ -350,14 +351,16 @@ Focus on: about, team, staff, people, contact, leadership pages."""
     def _discover_linkedin_url_gpt(self, social_data: dict, all_content: str, domain: str) -> str:
         """🧠 Enhanced LinkedIn URL discovery using GPT-4o as backup"""
         
-        # First, try the extracted social media data
+        # First, try the extracted social media data and clean it
         linkedin_url = (social_data.get('company_linkedin') or 
                        social_data.get('linkedin') or 
                        social_data.get('LinkedIn') or "")
         
-        if linkedin_url and self._validate_linkedin_url(linkedin_url, domain):
-            print(f"✅ LinkedIn URL found from social extraction: {linkedin_url}")
-            return linkedin_url
+        if linkedin_url:
+            cleaned_url = self._clean_linkedin_url(linkedin_url)
+            if self._validate_linkedin_url(cleaned_url, domain):
+                print(f"✅ LinkedIn URL found from social extraction: {cleaned_url}")
+                return cleaned_url
         
         # If no valid URL found, use GPT-4o to find it from content
         print("🧠 Using GPT-4o to find LinkedIn URL from content...")
@@ -378,7 +381,7 @@ RULES:
 1. Look for LinkedIn URLs that contain '/company/' (these are company pages)
 2. The URL should be for {domain} specifically
 3. Ignore personal LinkedIn profiles (they contain '/in/')
-4. Return the complete, clean URL
+4. Return the complete, clean URL in the standard format
 
 If found, return ONLY the URL in this format:
 https://www.linkedin.com/company/company-name
@@ -444,9 +447,11 @@ If not found, return: NOT_FOUND"""
         elif not url.startswith("https://"):
             url = "https://" + url
             
-        # Ensure proper LinkedIn domain
-        if "linkedin.com" not in url:
-            return ""
+        # Ensure proper LinkedIn domain (convert uk.linkedin.com to www.linkedin.com)
+        if "uk.linkedin.com" in url:
+            url = url.replace("uk.linkedin.com", "www.linkedin.com")
+        elif "linkedin.com" in url and "www.linkedin.com" not in url:
+            url = url.replace("linkedin.com", "www.linkedin.com")
             
         # Remove trailing slash
         url = url.rstrip('/')
@@ -454,29 +459,35 @@ If not found, return: NOT_FOUND"""
         return url
 
     def _extract_emails_from_content(self, content: str, domain: str) -> list:
-        """📧 Extract emails from website content"""
+        """📧 Extract and clean emails from website content"""
         
         if not content:
             return []
             
-        # Email regex pattern
+        # Enhanced email regex pattern
         email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
         
-        # Find all emails
-        emails = re.findall(email_pattern, content)
+        # Find all potential emails
+        potential_emails = re.findall(email_pattern, content)
         
         # Filter and clean emails
         domain_emails = []
-        for email in emails:
+        for email in potential_emails:
             email = email.lower().strip()
             
             # Only keep emails from the target domain
             if f"@{domain}" in email:
-                # Clean email (remove any trailing punctuation)
-                email = re.sub(r'[.,;:!?"\'>)\]}]*$', '', email)
+                # Clean email - remove any trailing garbage
+                email = re.sub(r'[.,;:!?"\'>)\]}\s]*$', '', email)
                 
-                if email not in domain_emails and len(email) > 5:
-                    domain_emails.append(email)
+                # Remove common garbage patterns that get attached
+                email = re.sub(r'(contact|info|admin|support|mail|email)\w*$', '', email)
+                email = re.sub(r'\d+.*$', '', email)  # Remove trailing numbers and text
+                
+                # Validate email format after cleaning
+                if re.match(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$', email):
+                    if email not in domain_emails and len(email) > 5:
+                        domain_emails.append(email)
         
         print(f"📧 Found {len(domain_emails)} emails from {domain}: {domain_emails}")
         return domain_emails
