@@ -1,7 +1,8 @@
 """
-🔧 Account Manager Module
+🔧 Account Manager Module - FIXED MillionVerifier API
 ========================
 Handles Apify account rotation and MillionVerifier credit management
+✅ FIXED: MillionVerifier API endpoint and credit checking
 """
 
 import os
@@ -13,7 +14,7 @@ from apify_client import ApifyClient
 
 
 class MillionVerifierManager:
-    """💰 Real-time MillionVerifier credit tracking and smart catch-all logic"""
+    """💰 FIXED: Real-time MillionVerifier credit tracking and smart catch-all logic"""
     
     def __init__(self):
         self.api_key = os.getenv('MILLIONVERIFIER_API_KEY')
@@ -21,7 +22,7 @@ class MillionVerifierManager:
         self.last_update = None
         
     def get_real_time_credits(self):
-        """📊 Get real-time MillionVerifier credits with caching"""
+        """📊 FIXED: Get real-time MillionVerifier credits using working API method"""
         
         try:
             # Cache for 30 seconds to avoid excessive API calls
@@ -31,8 +32,13 @@ class MillionVerifierManager:
                 now - self.last_update < 30):
                 return self.credits_cache
             
-            url = "https://api.millionverifier.com/api/v3/credits"
-            params = {'api': self.api_key}
+            # Use the WORKING API method from millionverifier_api.py
+            url = "https://api.millionverifier.com/api/v3/"
+            params = {
+                'api': self.api_key,
+                'email': 'test@example.com',  # Dummy email to check credits
+                'timeout': 1  # Short timeout to just get credits
+            }
             
             response = requests.get(url, params=params, timeout=10)
             
@@ -45,8 +51,15 @@ class MillionVerifierManager:
                 
                 print(f"💳 MillionVerifier Credits: {credits}")
                 return credits
+            elif response.status_code == 401:
+                print(f"⚠️ MillionVerifier API: Invalid API key (401)")
+                return 0
+            elif response.status_code == 402:
+                print(f"⚠️ MillionVerifier API: No credits remaining (402)")
+                return 0
             else:
                 print(f"⚠️ MillionVerifier credits API error: {response.status_code}")
+                print(f"Response: {response.text[:200]}")
                 return self.credits_cache or 0
                 
         except Exception as e:
@@ -54,7 +67,7 @@ class MillionVerifierManager:
             return self.credits_cache or 0
     
     def smart_verify_email(self, email, domain=None):
-        """🧠 FIXED: Smart MillionVerifier with real-time credits and catch-all intelligence"""
+        """🧠 FIXED: Smart MillionVerifier with real-time credits and proper verification"""
         
         if not self.api_key:
             print(f"      ⚠️ MillionVerifier API key not found - assuming valid")
@@ -91,14 +104,14 @@ class MillionVerifierManager:
                 print(f"      📊 MillionVerifier response: quality='{quality}', result='{result_status}'")
                 print(f"      💳 Credits: {credits_after} (used: {credits_used})")
                 
-                # 🧠 SMART LOGIC: Accept ANY email source, not just specific ones
+                # 🧠 SMART LOGIC: Accept various valid email types
                 if quality == 'good' and result_status in ['ok', 'deliverable']:
                     print(f"      ✅ MillionVerifier: {email} is valid - ACCEPT")
                     return True
                     
                 elif quality == 'risky' and result_status == 'catch_all':
                     print(f"      ⚠️ MillionVerifier: {email} is on catch-all domain - ACCEPT")
-                    # NEW: Accept ALL emails on catch-all domains
+                    # Accept catch-all domains as they might work
                     return True
                         
                 elif result_status in ['invalid', 'disposable'] or quality == 'bad':
@@ -107,8 +120,18 @@ class MillionVerifierManager:
                     
                 else:
                     print(f"      ⚠️ MillionVerifier: {email} status '{quality}'/'{result_status}' - ACCEPT")
-                    # NEW: Accept unknown statuses
+                    # Accept unknown statuses to be safe
                     return True
+                    
+            elif response.status_code == 401:
+                print(f"      ❌ MillionVerifier: Invalid API key (401)")
+                return True  # Assume valid if API key issue
+            elif response.status_code == 402:
+                print(f"      ⚠️ MillionVerifier: No credits remaining (402)")
+                return True  # Assume valid if no credits
+            elif response.status_code == 429:
+                print(f"      ⚠️ MillionVerifier: Rate limit exceeded (429) - assuming valid")
+                return True
             else:
                 print(f"      ⚠️ MillionVerifier API error: {response.status_code} - assuming valid")
                 return True
