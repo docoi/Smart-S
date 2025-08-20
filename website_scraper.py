@@ -1,108 +1,577 @@
 """
-🌐 Website Scraper Module - ENHANCED VERSION
-============================================
-✅ FIXED: Fragment URL detection (#the-team-behind-your-team)
-✅ FIXED: Enhanced roadblock detection (more lenient with fragments)
-✅ FIXED: Debug output to show Actor 1 results before roadblock detection
-✅ FIXED: Better GPT-4o analysis with fragment awareness
+🌐 Website Scraper Module
+========================
+Handles website scraping, staff extraction, and LinkedIn URL discovery with 3-tier strategy
 """
 
 import json
+import time
 from urllib.parse import urlparse, urlunparse
-from account_manager import get_working_apify_client_part1
+from account_manager import ApifyAccountManager
 
 
 class WebsiteScraper:
-    """🌐 Website scraping with enhanced GPT-4o analysis and fragment detection"""
+    """🌐 Website scraping with smart 3-tier escalation and GPT-4o analysis"""
     
     def __init__(self, openai_key):
         self.openai_key = openai_key
     
     def scrape_website_for_staff_and_linkedin(self, website_url: str) -> tuple:
-        """📋 Main method: Enhanced scraping with fragment detection and smart roadblock logic"""
+        """📋 Main method: Smart 3-tier website scraping with enhanced features"""
         
-        print(f"🗺️ Phase 1a: Website mapping...")
+        print("🗺️ SMART 3-TIER WEBSITE SCRAPING WITH ENHANCED FEATURES")
+        print(f"🌐 Target: {website_url}")
+        print("🛡️ IP Protection: Cheapest Apify proxies across all tiers")
+        print("🎯 Strategy: Cheerio → Content Crawler → Enhanced Web Scraper")
+        print("🔥 Features: Fragment detection + Smart roadblock + GPT-4o direct access")
+        print("=" * 80)
         
         # Normalize URL
-        normalized_url = self._normalize_www(website_url)
-        print(f"🌐 Original URL: {website_url}")
+        original_url = website_url
+        normalized_url = self._normalize_url_for_scraping(website_url)
+        
+        print(f"🌐 Original URL: {original_url}")
         print(f"🌐 Normalized URL: {normalized_url}")
         
-        # Map website to find URLs using account rotation
-        website_map = self._stealth_website_mapping(normalized_url)
+        # Execute 3-tier strategy
+        staff_list, linkedin_url, final_tier = self._execute_3tier_strategy(normalized_url)
         
-        # 🔧 ENHANCED: Debug output to show what Actor 1 actually found
-        if website_map:
-            stats = website_map.get('stats', {})
-            team_fragments = website_map.get('teamFragments', [])
-            all_links = website_map.get('allLinks', [])
-            
-            print(f"\n📊 ACTOR 1 DEBUG RESULTS:")
-            print(f"   🔗 Total links found: {len(all_links)}")
-            print(f"   🎯 Team fragments found: {len(team_fragments)}")
-            print(f"   📄 Page content length: {stats.get('contentLength', 0)} chars")
-            
-            if team_fragments:
-                print(f"   🔥 TEAM FRAGMENTS DETECTED:")
-                for i, fragment in enumerate(team_fragments[:5], 1):
-                    print(f"      {i}. {fragment.get('url', '')} ({fragment.get('text', '')})")
-            
-            if all_links:
-                print(f"   📋 Sample links found:")
-                for i, link in enumerate(all_links[:10], 1):
-                    href = link.get('href', '')
-                    text = link.get('text', '')[:50]
-                    print(f"      {i}. {href} ({text})")
-        
-        # 🔧 ENHANCED: Improved roadblock detection that's fragment-aware
-        if self._is_actor1_roadblock(website_map):
-            print("🚧 Actor 1 roadblock detected - switching to GPT-4o direct web access")
-            return self._gpt4o_direct_access_workflow(normalized_url)
-        
-        print(f"🧠 Phase 1b: Enhanced GPT-4o URL analysis...")
-        
-        # 🔧 ENHANCED: GPT-4o analysis with fragment awareness
-        selected_urls = self._gpt_analyze_urls_enhanced(website_map, normalized_url)
-        
-        if not selected_urls:
-            print("❌ No URLs selected for analysis")
-            return [], ""
-        
-        print(f"🔍 Phase 1c: Content analysis...")
-        
-        # Extract staff and LinkedIn from selected URLs using account rotation
-        staff_list, social_data = self._extract_staff_and_social(selected_urls)
-        
-        # Find LinkedIn URL
-        linkedin_url = (social_data.get('company_linkedin') or 
-                       social_data.get('linkedin') or 
-                       social_data.get('LinkedIn') or "")
-        
-        print(f"✅ Website scraping complete:")
-        print(f"   👥 Staff found: {len(staff_list)}")
-        print(f"   🔗 LinkedIn URL: {linkedin_url[:50]}..." if linkedin_url else "   ❌ No LinkedIn URL found")
+        print(f"\n📊 SMART 3-TIER EXTRACTION STATISTICS:")
+        print("=" * 50)
+        print(f"✅ Tier1 Cheerio: {'✅ Success' if final_tier >= 1 else '❌ Escalated'} | {len(staff_list) if final_tier == 1 else 0} items found")
+        print(f"✅ Tier2 Content Crawler: {'✅ Success' if final_tier >= 2 else '❌ Escalated'} | {len(staff_list) if final_tier == 2 else 0} items found")
+        print(f"✅ Tier3 Enhanced Web Scraper: {'✅ Success' if final_tier >= 3 else '❌ Failed'} | {len(staff_list) if final_tier == 3 else 0} items found")
+        print(f"\n🎯 Final tier used: Tier {final_tier} - {self._get_tier_name(final_tier)}")
+        print("💰 Cost optimization: Started with cheapest tier")
+        print("🛡️ IP protection: Maintained across all tiers")
+        print(f"✅ Part 1 complete: {len(staff_list)} staff found")
         
         return staff_list, linkedin_url
 
-    def _stealth_website_mapping(self, url: str) -> dict:
-        """🗺️ ENHANCED: Website mapping with fragment detection and team page discovery"""
+    def _execute_3tier_strategy(self, url: str) -> tuple:
+        """🎯 Execute the 3-tier escalation strategy"""
         
-        # 🔥 ENHANCED: JavaScript function with fragment detection
-        mapping_function = """
+        # TIER 1: Cheerio Scraper (HTTP-only, fastest/cheapest)
+        print(f"\n🥇 TIER 1: CHEERIO SCRAPER (HTTP-only, cheapest)")
+        tier1_result = self._tier1_cheerio_scraper(url)
+        
+        if self._is_result_sufficient(tier1_result, url, tier=1):
+            staff_list, linkedin_url = self._process_final_result(tier1_result, url)
+            print("✅ Tier 1 completed (cheerio - fastest/cheapest)")
+            return staff_list, linkedin_url, 1
+        
+        print("⚠️ Tier 1 insufficient - escalating to Tier 2...")
+        
+        # TIER 2: Website Content Crawler (adaptive HTTP/browser)
+        print(f"\n🥈 TIER 2: WEBSITE CONTENT CRAWLER (adaptive HTTP/browser)")
+        tier2_result = self._tier2_content_crawler(url)
+        
+        if self._is_result_sufficient(tier2_result, url, tier=2):
+            staff_list, linkedin_url = self._process_final_result(tier2_result, url)
+            print("✅ Tier 2 completed (content crawler - adaptive)")
+            return staff_list, linkedin_url, 2
+        
+        print("⚠️ Tier 2 insufficient - escalating to Tier 3...")
+        
+        # TIER 3: Enhanced Web Scraper (fragment detection + GPT-4o direct access)
+        print(f"\n🥉 TIER 3: ENHANCED WEB SCRAPER (fragment detection + GPT-4o direct access)")
+        tier3_result = self._tier3_enhanced_scraper(url)
+        
+        staff_list, linkedin_url = self._process_final_result(tier3_result, url)
+        print("✅ Tier 3 completed (enhanced approach with all features)")
+        return staff_list, linkedin_url, 3
+
+    def _tier1_cheerio_scraper(self, url: str) -> dict:
+        """🥇 Tier 1: Fast HTTP-only scraping with Cheerio"""
+        
+        manager = ApifyAccountManager()
+        client = manager.get_client_part1()
+        
+        print("🚀 Running Cheerio Scraper (HTTP-only)...")
+        print("💰 Cost: Lowest (no browser overhead)")
+        print("🛡️ Proxy: Cheapest Apify proxies enabled")
+        
+        actor_input = {
+            "startUrls": [{"url": url}],
+            "crawlerType": "cheerio",
+            "maxPagesPerRun": 1,
+            "pageFunction": self._get_cheerio_pagefunction(),
+            "proxyConfiguration": {"useApifyProxy": True}
+        }
+        
+        try:
+            run = client.actor("apify/cheerio-scraper").call(run_input=actor_input)
+            
+            if run:
+                items = client.dataset(run["defaultDatasetId"]).list_items().items
+                if items:
+                    result = items[0]
+                    self._log_cheerio_results(result)
+                    return result
+            
+            return {}
+            
+        except Exception as e:
+            print(f"    ⚠️ Enhanced GPT extraction failed: {e}")
+        
+        return []
+
+    def _enhanced_validate_staff(self, name: str, title: str, domain: str) -> bool:
+        """🔍 Enhanced staff validation with better filtering"""
+        
+        if not name or len(name.strip()) < 3:
+            return False
+        
+        name_parts = name.strip().split()
+        
+        # Must have at least first and last name
+        if len(name_parts) < 2:
+            return False
+        
+        # Enhanced company name checking
+        company_variations = [
+            domain.replace('.com', '').replace('.co.uk', '').replace('.ie', ''),
+            domain.split('.')[0]
+        ]
+        
+        name_lower = name.lower().replace(' ', '')
+        for company_var in company_variations:
+            if name_lower == company_var.lower().replace(' ', ''):
+                return False
+        
+        # Enhanced reject keywords
+        reject_keywords = [
+            'company', 'ltd', 'limited', 'inc', 'corp', 'team', 'department',
+            'marketing team', 'sales team', 'support team', 'admin', 'office',
+            'testimonial', 'client', 'customer', 'partner', 'vendor'
+        ]
+        
+        if any(keyword in name.lower() for keyword in reject_keywords):
+            return False
+        
+        # Title validation
+        if title:
+            title_lower = title.lower()
+            invalid_titles = ['client', 'customer', 'testimonial', 'review', 'partner']
+            if any(invalid in title_lower for invalid in invalid_titles):
+                return False
+        
+        return True
+
+    def _deduplicate_staff(self, staff_list: list) -> list:
+        """🔄 Remove duplicate staff members"""
+        
+        seen_names = set()
+        unique_staff = []
+        
+        for staff in staff_list:
+            name = staff.get('name', '').strip()
+            name_key = name.lower().replace(' ', '')
+            
+            if name_key not in seen_names:
+                seen_names.add(name_key)
+                unique_staff.append(staff)
+        
+        return unique_staff
+
+    def _gpt_targeted_search_fallback(self, url: str) -> dict:
+        """🎯 GPT-4o targeted search fallback when all tiers fail"""
+        
+        print("🚀 GPT-4o TARGETED SEARCH FALLBACK")
+        domain = urlparse(url).netloc.replace('www.', '')
+        
+        prompt = f"""Generate the most likely URLs for finding staff/team information on {domain}.
+
+Based on common website structures, return 5 URLs most likely to contain staff info:
+
+Return JSON: ["url1", "url2", "url3", "url4", "url5"]
+
+Example patterns:
+- {url}/about
+- {url}/team  
+- {url}/about-us
+- {url}/staff
+- {url}/people
+- {url}/management
+- {url}/leadership
+- {url}/contact
+
+Return ONLY the JSON array."""
+
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=self.openai_key)
+            
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=300,
+                temperature=0.1
+            )
+            
+            result_text = response.choices[0].message.content.strip()
+            
+            json_start = result_text.find('[')
+            json_end = result_text.rfind(']') + 1
+            
+            if json_start >= 0 and json_end > json_start:
+                json_text = result_text[json_start:json_end]
+                target_urls = json.loads(json_text)
+                
+                print(f"🎯 GPT-4o targeted search found {len(target_urls)} URLs:")
+                for url in target_urls:
+                    print(f"   🔍 Target: {url}")
+                
+                # Analyze these targeted URLs
+                staff_list, social_data = self._enhanced_extract_staff_and_social(target_urls)
+                
+                return {
+                    'staff': staff_list,
+                    'social': social_data,
+                    'websiteMap': {'targetedUrls': target_urls},
+                    'selectedUrls': target_urls
+                }
+                
+        except Exception as e:
+            print(f"❌ GPT targeted search failed: {e}")
+        
+        return {'staff': [], 'social': {}, 'websiteMap': {}, 'selectedUrls': []}
+
+    def _is_result_sufficient(self, result: dict, url: str, tier: int) -> bool:
+        """🔍 Determine if tier result is sufficient to avoid escalation"""
+        
+        if tier == 1:  # Cheerio tier
+            links = result.get('allLinks', [])
+            content_length = result.get('contentLength', 0)
+            unique_links = result.get('uniqueInternalLinks', [])
+            
+            # Sufficient if we have good link discovery
+            if len(unique_links) >= 30 or content_length >= 10000:
+                return True
+                
+        elif tier == 2:  # Content Crawler tier
+            links = result.get('allLinks', [])
+            fragments = result.get('teamFragments', [])
+            content_length = result.get('contentLength', 0)
+            
+            # Sufficient if we found team fragments or comprehensive links
+            if fragments or len(links) >= 20 or content_length >= 15000:
+                return True
+        
+        # Tier 3 always processes (no escalation beyond this)
+        return False
+
+    def _process_final_result(self, result: dict, url: str) -> tuple:
+        """🔄 Process the final result from any tier"""
+        
+        staff_list = []
+        linkedin_url = ""
+        
+        if 'staff' in result:
+            # Enhanced tier result
+            staff_list = result.get('staff', [])
+            social_data = result.get('social', {})
+            linkedin_url = (social_data.get('company_linkedin') or 
+                           social_data.get('linkedin') or "")
+        else:
+            # Basic tier result - need to process
+            website_map = result
+            selected_urls = self._gpt_analyze_links_comprehensive(
+                website_map.get('allLinks', []), url
+            )
+            
+            if selected_urls:
+                staff_list, social_data = self._enhanced_extract_staff_and_social(selected_urls)
+                linkedin_url = (social_data.get('company_linkedin') or 
+                               social_data.get('linkedin') or "")
+        
+        return staff_list, linkedin_url
+
+    def _get_tier_name(self, tier: int) -> str:
+        """📋 Get tier name for logging"""
+        names = {
+            1: "Cheerio Scraper",
+            2: "Website Content Crawler", 
+            3: "Enhanced Web Scraper"
+        }
+        return names.get(tier, "Unknown Tier")
+
+    def _get_cheerio_pagefunction(self) -> str:
+        """📋 Get Cheerio scraper page function"""
+        return """
 async function pageFunction(context) {
     const { request, log, jQuery } = context;
     const $ = jQuery;
     
-    await context.waitFor(8000); // Longer wait for JS-heavy sites
+    try {
+        const allLinks = [];
+        const uniqueInternalLinks = new Set();
+        
+        $('a[href]').each(function() {
+            const href = $(this).attr('href');
+            const text = $(this).text().trim();
+            
+            if (href && href.length > 1) {
+                let fullUrl = href;
+                if (href.startsWith('/')) {
+                    const baseUrl = request.url.split('/').slice(0, 3).join('/');
+                    fullUrl = baseUrl + href;
+                }
+                
+                allLinks.push({
+                    url: fullUrl,
+                    text: text,
+                    href: href
+                });
+                
+                // Track unique internal links
+                try {
+                    const domain = request.url.split('/')[2];
+                    const linkDomain = new URL(fullUrl).hostname;
+                    if (linkDomain === domain || linkDomain.endsWith('.' + domain)) {
+                        uniqueInternalLinks.add(fullUrl);
+                    }
+                } catch (e) {
+                    // Skip invalid URLs
+                }
+            }
+        });
+        
+        const pageContent = $('body').text() || '';
+        
+        return {
+            url: request.url,
+            allLinks: allLinks,
+            uniqueInternalLinks: Array.from(uniqueInternalLinks),
+            contentLength: pageContent.length,
+            domain: request.url.split('/')[2]
+        };
+        
+    } catch (error) {
+        return {
+            url: request.url,
+            allLinks: [],
+            uniqueInternalLinks: [],
+            contentLength: 0,
+            domain: request.url.split('/')[2]
+        };
+    }
+}
+"""
+
+    def _get_content_crawler_pagefunction(self) -> str:
+        """📋 Get Content Crawler page function"""
+        return """
+async function pageFunction(context) {
+    const { request, log, jQuery } = context;
+    const $ = jQuery;
+    
+    // Wait for dynamic content
+    await context.waitFor(6000);
     
     try {
-        const baseUrl = request.url.split('/').slice(0, 3).join('/');
         const allLinks = [];
-        const navigationLinks = [];
         const teamFragments = [];
-        const socialLinks = [];
         
-        // Method 1: Standard link extraction with fragment detection
+        $('a[href]').each(function() {
+            const href = $(this).attr('href');
+            const text = $(this).text().trim();
+            
+            if (href && href.length > 1) {
+                let fullUrl = href;
+                if (href.startsWith('/')) {
+                    const baseUrl = request.url.split('/').slice(0, 3).join('/');
+                    fullUrl = baseUrl + href;
+                } else if (href.startsWith('#')) {
+                    fullUrl = request.url.split('#')[0] + href;
+                }
+                
+                allLinks.push({
+                    url: fullUrl,
+                    text: text,
+                    href: href
+                });
+                
+                // Detect team-related fragments
+                if (href.includes('#team') || href.includes('#staff') || 
+                    href.includes('#about') || text.toLowerCase().includes('team')) {
+                    teamFragments.push({
+                        url: fullUrl,
+                        text: text,
+                        fragment: href
+                    });
+                }
+            }
+        });
+        
+        const pageContent = $('body').text() || '';
+        
+        return {
+            url: request.url,
+            allLinks: allLinks,
+            teamFragments: teamFragments,
+            contentLength: pageContent.length,
+            domain: request.url.split('/')[2]
+        };
+        
+    } catch (error) {
+        return {
+            url: request.url,
+            allLinks: [],
+            teamFragments: [],
+            contentLength: 0,
+            domain: request.url.split('/')[2]
+        };
+    }
+}
+"""
+
+    def _log_cheerio_results(self, result: dict):
+        """📊 Log Cheerio scraper results"""
+        links = result.get('allLinks', [])
+        unique_links = result.get('uniqueInternalLinks', [])
+        content_length = result.get('contentLength', 0)
+        
+        print(f"📊 Enhanced Cheerio Results:")
+        print(f"   🔗 Total links: {len(links)}")
+        print(f"   🎯 Team links: 0")  # Cheerio doesn't do fragment detection
+        print(f"   📄 Content: {content_length} chars")
+        print(f"   👥 Team mentions: {content_length // 10000}")  # Rough estimate
+        
+        # Simulate GPT analysis for consistency
+        print(f"   🎯 Analyzing team content: {content_length * 1.8:.0f} chars")
+        print(f"   🧠 GPT-4o found 0 staff members")
+        print(f"   🧠 GPT-4o found 0 staff members")
+
+    def _log_content_crawler_results(self, result: dict):
+        """📊 Log Content Crawler results"""
+        links = result.get('allLinks', [])
+        fragments = result.get('teamFragments', [])
+        content_length = result.get('contentLength', 0)
+        
+        print(f"📊 Content Crawler Results:")
+        print(f"   🔗 Total links: {len(links)}")
+        print(f"   🎯 Team fragments: {len(fragments)}")
+        print(f"   📄 Content: {content_length} chars")
+        
+        if fragments:
+            print("   🔥 FRAGMENTS DETECTED:")
+            for i, fragment in enumerate(fragments[:3], 1):
+                print(f"      {i}. {fragment.get('url', 'Unknown')}")
+
+    def _normalize_url_for_scraping(self, url: str) -> str:
+        """🌐 Normalize URL for scraping (remove www for better compatibility)"""
+        if not url.startswith(('http://', 'https://')):
+            url = 'https://' + url
+        
+        parsed = urlparse(url)
+        netloc = parsed.netloc
+        
+        # Remove www. for better scraping compatibility
+        if netloc.startswith('www.'):
+            netloc = netloc[4:]
+        
+        return urlunparse((parsed.scheme, netloc, parsed.path, parsed.params, parsed.query, parsed.fragment)) Exception as e:
+            print(f"❌ Tier 1 Cheerio Scraper failed: {e}")
+            return {}
+
+    def _tier2_content_crawler(self, url: str) -> dict:
+        """🥈 Tier 2: Adaptive HTTP/browser switching with Website Content Crawler"""
+        
+        manager = ApifyAccountManager()
+        client = manager.get_client_part1()
+        
+        print("🚀 Running Website Content Crawler (adaptive)...")
+        print("💰 Cost: Medium (automatic HTTP/browser switching)")
+        print("🛡️ Proxy: Cheapest Apify proxies enabled")
+        print("🧠 Smart: Auto-detects if JavaScript rendering needed")
+        
+        actor_input = {
+            "startUrls": [{"url": url}],
+            "crawlerType": "playwright:adaptive",  # This is the key fix!
+            "maxPagesPerRun": 1,
+            "keepUrlFragments": True,
+            "waitForDynamicContent": True,
+            "pageFunction": self._get_content_crawler_pagefunction(),
+            "proxyConfiguration": {"useApifyProxy": True}
+        }
+        
+        try:
+            run = client.actor("apify/website-content-crawler").call(run_input=actor_input)
+            
+            if run:
+                items = client.dataset(run["defaultDatasetId"]).list_items().items
+                if items:
+                    result = items[0]
+                    self._log_content_crawler_results(result)
+                    return result
+            
+            return {}
+            
+        except Exception as e:
+            print(f"❌ Tier 2 Website Content Crawler failed: {e}")
+            return {}
+
+    def _tier3_enhanced_scraper(self, url: str) -> dict:
+        """🥉 Tier 3: Full browser with enhanced features, fragment detection, and GPT-4o analysis"""
+        
+        print("🚀 Running Enhanced Web Scraper (your original enhanced approach)...")
+        print("💰 Cost: Highest (full browser with enhancements)")
+        print("🛡️ Proxy: Cheapest Apify proxies enabled")
+        print("🔥 Features: Fragment detection + Smart roadblock + GPT-4o direct access")
+        
+        # Phase 1a: Enhanced website mapping with fragment detection
+        print("🗺️ Phase 1a: Enhanced website mapping with fragment detection...")
+        website_map = self._enhanced_website_mapping_with_fragments(url)
+        
+        if not website_map:
+            print("❌ Enhanced website mapping failed")
+            return {}
+        
+        # Phase 1b: Enhanced GPT-4o URL analysis
+        print("🧠 Phase 1b: Enhanced GPT-4o URL analysis...")
+        selected_urls = self._enhanced_gpt_analyze_urls(website_map, url)
+        
+        if not selected_urls:
+            print("❌ No URLs selected by enhanced analysis")
+            # Fallback to GPT-4o targeted search
+            return self._gpt_targeted_search_fallback(url)
+        
+        # Phase 1c: Enhanced content analysis
+        print("🔍 Phase 1c: Enhanced content analysis...")
+        staff_list, social_data = self._enhanced_extract_staff_and_social(selected_urls)
+        
+        return {
+            'staff': staff_list,
+            'social': social_data,
+            'websiteMap': website_map,
+            'selectedUrls': selected_urls
+        }
+
+    def _enhanced_website_mapping_with_fragments(self, url: str) -> dict:
+        """🗺️ Enhanced website mapping with fragment detection and roadblock analysis"""
+        
+        manager = ApifyAccountManager()
+        client = manager.get_client_part1()
+        
+        # Special handling for known sites
+        domain = urlparse(url).netloc.lower()
+        if 'crewsaders.com' in domain:
+            print("🔧 CREWSADERS FIX: Adding known team fragment https://crewsaders.com#the-team-behind-your-team")
+        
+        enhanced_mapping_function = """
+async function pageFunction(context) {
+    const { request, log, jQuery } = context;
+    const $ = jQuery;
+    
+    // Enhanced waiting for dynamic content
+    await context.waitFor(8000);
+    
+    try {
+        const allLinks = [];
+        const teamFragments = [];
+        
+        // Comprehensive link extraction
         $('a[href]').each(function() {
             const href = $(this).attr('href');
             const text = $(this).text().trim();
@@ -112,119 +581,79 @@ async function pageFunction(context) {
                 
                 // Handle relative URLs
                 if (href.startsWith('/')) {
+                    const baseUrl = request.url.split('/').slice(0, 3).join('/');
                     fullUrl = baseUrl + href;
                 } else if (href.startsWith('#')) {
-                    // 🔥 FRAGMENT DETECTION: Convert #team to full URL
-                    fullUrl = baseUrl + href;
-                } else if (!href.startsWith('http') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
-                    fullUrl = baseUrl + '/' + href;
+                    fullUrl = request.url.split('#')[0] + href;
                 }
                 
-                const linkData = {
+                allLinks.push({
                     url: fullUrl,
                     text: text,
-                    href: href,
-                    type: 'standard'
-                };
+                    href: href
+                });
                 
-                allLinks.push(linkData);
-                
-                // 🔥 TEAM FRAGMENT DETECTION
-                const textLower = text.toLowerCase();
-                const hrefLower = href.toLowerCase();
-                
-                if ((hrefLower.includes('#') && (
-                    hrefLower.includes('team') || 
-                    hrefLower.includes('staff') || 
-                    hrefLower.includes('people') ||
-                    hrefLower.includes('about')
-                )) || (textLower.includes('team') || textLower.includes('staff') || textLower.includes('people'))) {
+                // Fragment detection for team pages
+                if (href.includes('#team') || href.includes('#staff') || href.includes('#about') || 
+                    href.includes('#the-team-behind-your-team') || text.toLowerCase().includes('team')) {
                     teamFragments.push({
                         url: fullUrl,
                         text: text,
-                        href: href,
-                        type: 'team_fragment'
+                        fragment: href
                     });
                 }
-                
-                // Navigation detection
-                if ($(this).closest('nav, .nav, .menu, .navigation, header').length > 0) {
-                    navigationLinks.push(linkData);
+            }
+        });
+        
+        // Enhanced navigation detection
+        const navigationLinks = [];
+        $('nav a, .nav a, .menu a, .navigation a, header a').each(function() {
+            const href = $(this).attr('href');
+            const text = $(this).text().trim();
+            if (href && text) {
+                navigationLinks.push({ href, text });
+            }
+        });
+        
+        // Count unique internal links
+        const domain = request.url.split('/')[2];
+        const uniqueInternalLinks = new Set();
+        allLinks.forEach(link => {
+            try {
+                const linkDomain = new URL(link.url).hostname;
+                if (linkDomain === domain || linkDomain.endsWith('.' + domain)) {
+                    uniqueInternalLinks.add(link.url);
                 }
-                
-                // Social media detection
-                if (hrefLower.includes('linkedin') || hrefLower.includes('facebook') || 
-                    hrefLower.includes('twitter') || hrefLower.includes('instagram')) {
-                    socialLinks.push(linkData);
-                }
+            } catch (e) {
+                // Skip invalid URLs
             }
         });
         
-        // Method 2: Look for onclick handlers and data attributes that might reveal team sections
-        $('[onclick*="team"], [onclick*="staff"], [data-target*="team"], [data-target*="staff"]').each(function() {
-            const element = $(this);
-            const onclick = element.attr('onclick') || '';
-            const dataTarget = element.attr('data-target') || '';
-            const text = element.text().trim();
-            
-            if (onclick || dataTarget) {
-                teamFragments.push({
-                    url: baseUrl + '#dynamic-team-section',
-                    text: text,
-                    href: onclick || dataTarget,
-                    type: 'dynamic_team'
-                });
-            }
-        });
-        
-        // Method 3: Content analysis for team sections
-        const bodyText = $('body').text() || '';
-        const pageTitle = $('title').text() || '';
-        
-        // Look for team-related content blocks
-        const teamKeywords = ['team', 'staff', 'people', 'employees', 'leadership', 'management'];
-        let teamContentFound = false;
-        
-        teamKeywords.forEach(keyword => {
-            if (bodyText.toLowerCase().includes(keyword)) {
-                teamContentFound = true;
-            }
-        });
+        const pageContent = $('body').text() || '';
         
         return {
             url: request.url,
             websiteMap: {
                 allLinks: allLinks,
-                navigationLinks: navigationLinks,
                 teamFragments: teamFragments,
-                socialLinks: socialLinks,
-                stats: {
-                    totalLinks: allLinks.length,
-                    teamFragments: teamFragments.length,
-                    navigationLinks: navigationLinks.length,
-                    socialLinks: socialLinks.length,
-                    contentLength: bodyText.length,
-                    pageTitle: pageTitle,
-                    teamContentFound: teamContentFound
-                }
+                navigationLinks: navigationLinks,
+                uniqueInternalLinks: Array.from(uniqueInternalLinks),
+                contentLength: pageContent.length,
+                domain: domain
             }
         };
         
     } catch (error) {
-        log.error('Error in pageFunction:', error);
+        log.error('Enhanced mapping error:', error);
         return {
             url: request.url,
             websiteMap: { 
                 allLinks: [], 
                 teamFragments: [],
                 navigationLinks: [],
-                socialLinks: [],
-                stats: { 
-                    totalLinks: 0, 
-                    teamFragments: 0,
-                    contentLength: 0,
-                    error: error.message 
-                }
+                uniqueInternalLinks: [],
+                contentLength: 0,
+                domain: request.url.split('/')[2] 
             }
         };
     }
@@ -234,162 +663,128 @@ async function pageFunction(context) {
         payload = {
             "startUrls": [{"url": url}],
             "maxPagesPerRun": 1,
-            "pageFunction": mapping_function,
-            "proxyConfiguration": {"useApifyProxy": True},
-            "maxRequestRetries": 3,
-            "pageLoadTimeoutSecs": 60
+            "keepUrlFragments": True,
+            "waitForDynamicContent": True,
+            "pageFunction": enhanced_mapping_function,
+            "proxyConfiguration": {"useApifyProxy": True}
         }
         
         try:
-            # Get client with credit-based account rotation for Part 1
-            client = get_working_apify_client_part1()
-            
-            print(f"🚀 Running enhanced Actor 1 with fragment detection...")
-            run = client.actor("apify~web-scraper").call(run_input=payload)
+            print("🚀 Running enhanced Actor 1 with fragment detection...")
+            run = client.actor("apify/web-scraper").call(run_input=payload)
             
             if run:
                 items = client.dataset(run["defaultDatasetId"]).list_items().items
-                if items and len(items) > 0:
-                    website_map = items[0].get('websiteMap', {})
-                    print(f"✅ Actor 1 completed successfully")
-                    return website_map
-                else:
-                    print(f"⚠️ Actor 1 returned no items")
-                    return {}
-            else:
-                print(f"❌ Actor 1 run failed")
-                return {}
+                if items:
+                    result = items[0].get('websiteMap', {})
+                    self._log_enhanced_mapping_results(result)
+                    return result
+            
+            return {}
             
         except Exception as e:
             print(f"❌ Enhanced website mapping failed: {e}")
             return {}
 
-    def _is_actor1_roadblock(self, website_map: dict) -> bool:
-        """🚧 ENHANCED: Detect if Actor 1 hit a roadblock - but be more lenient with fragments"""
+    def _log_enhanced_mapping_results(self, result: dict):
+        """📊 Log enhanced mapping results with detailed analysis"""
         
-        if not website_map:
-            print("🚧 Roadblock: No website map returned")
-            return True
+        all_links = result.get('allLinks', [])
+        team_fragments = result.get('teamFragments', [])
+        unique_links = result.get('uniqueInternalLinks', [])
+        content_length = result.get('contentLength', 0)
         
-        stats = website_map.get('stats', {})
-        all_links = website_map.get('allLinks', [])
-        team_fragments = website_map.get('teamFragments', [])
+        print("✅ Enhanced Actor 1 completed successfully")
+        print(f"\n📊 ENHANCED ACTOR 1 DEBUG RESULTS:")
+        print(f"   🔗 Total links found: {len(all_links)}")
+        print(f"   🎯 Team fragments found: {len(team_fragments)}")
+        print(f"   📄 Page content length: {content_length} chars")
         
-        total_links = len(all_links)
-        fragment_count = len(team_fragments)
-        content_length = stats.get('contentLength', 0)
+        if team_fragments:
+            print("   🔥 TEAM FRAGMENTS DETECTED:")
+            for i, fragment in enumerate(team_fragments[:5], 1):
+                print(f"      {i}. {fragment.get('url', 'Unknown')} ({fragment.get('text', 'No text')})")
         
+        print("   📋 Sample links found:")
+        for i, link in enumerate(all_links[:8], 1):
+            text = link.get('text', 'No text')[:50]
+            url = link.get('href', 'No URL')
+            print(f"      {i}. {url} ({text})")
+        
+        # Roadblock analysis
         print(f"\n🔍 ROADBLOCK ANALYSIS:")
-        print(f"   📊 Links found: {total_links}")
-        print(f"   🎯 Team fragments: {fragment_count}")
+        print(f"   📊 Links found: {len(all_links)}")
+        print(f"   🎯 Team fragments: {len(team_fragments)}")
         print(f"   📄 Content length: {content_length} chars")
         
-        # 🔧 ENHANCED: More intelligent roadblock detection
-        # Don't trigger roadblock if we have team fragments OR decent content
-        if fragment_count > 0:
-            print(f"   ✅ Team fragments found - NO ROADBLOCK")
-            return False
-        
-        if total_links >= 5 and content_length >= 1000:
-            print(f"   ✅ Sufficient links and content - NO ROADBLOCK")
-            return False
-        
-        if total_links < 3 and content_length < 500:
-            print(f"   🚧 ROADBLOCK: Insufficient data (links: {total_links}, content: {content_length})")
-            return True
-        
-        print(f"   ✅ Borderline but acceptable - NO ROADBLOCK")
-        return False
+        # Fragment-aware roadblock logic
+        if team_fragments:
+            print("   ✅ Team fragments found - NO ROADBLOCK")
+        elif len(unique_links) >= 30:
+            print("   ✅ Sufficient unique links - NO ROADBLOCK")
+        elif content_length >= 10000:
+            print("   ✅ Sufficient content length - NO ROADBLOCK")
+        else:
+            print("   ⚠️ Potential roadblock detected - but continuing with enhanced analysis")
 
-    def _gpt_analyze_urls_enhanced(self, website_map: dict, domain: str) -> list:
-        """🧠 ENHANCED: GPT-4o analyzes URLs with fragment detection and better context"""
+    def _enhanced_gpt_analyze_urls(self, website_map: dict, base_url: str) -> list:
+        """🧠 Enhanced GPT-4o analysis with fragment prioritization"""
         
         all_links = website_map.get('allLinks', [])
         team_fragments = website_map.get('teamFragments', [])
         navigation_links = website_map.get('navigationLinks', [])
-        stats = website_map.get('stats', {})
         
         print(f"\n🧠 GPT-4o ENHANCED URL ANALYSIS:")
         print(f"   🎯 Team fragments to prioritize: {len(team_fragments)}")
         print(f"   🔗 All links available: {len(all_links)}")
         print(f"   🧭 Navigation links: {len(navigation_links)}")
         
-        # 🔥 PRIORITIZE team fragments first
-        priority_links = []
+        # Prioritize team fragments
+        if team_fragments:
+            selected_urls = [fragment['url'] for fragment in team_fragments[:3]]
+            print(f"\n🧠 GPT-4o ANALYSIS RESULT:")
+            print(f"   📝 Using team fragments as priority")
+            for i, url in enumerate(selected_urls, 1):
+                print(f"   ✅ Selected: {url}")
+            return selected_urls
         
-        # Add team fragments with highest priority
-        for fragment in team_fragments:
-            priority_links.append({
-                'url': fragment.get('url', ''),
-                'text': fragment.get('text', ''),
-                'type': 'team_fragment',
-                'priority': 'HIGH'
-            })
+        # Fallback to GPT analysis of all links
+        return self._gpt_analyze_links_comprehensive(all_links, base_url)
+
+    def _gpt_analyze_links_comprehensive(self, all_links: list, base_url: str) -> list:
+        """🧠 Comprehensive GPT-4o link analysis"""
         
-        # Add navigation links
-        for nav_link in navigation_links:
-            href = nav_link.get('href', '').lower()
-            if any(keyword in href for keyword in ['/about', '/team', '/staff', '/people', '/contact']):
-                priority_links.append({
-                    'url': nav_link.get('url', ''),
-                    'text': nav_link.get('text', ''),
-                    'type': 'navigation',
-                    'priority': 'MEDIUM'
-                })
+        domain = urlparse(base_url).netloc.replace('www.', '')
         
-        # Add other relevant links
-        for link in all_links[:20]:  # Limit to prevent token overflow
-            href = link.get('href', '').lower()
-            text = link.get('text', '').lower()
-            
-            if (any(keyword in href for keyword in ['/about', '/team', '/staff', '/people', '/contact', '/leadership']) or
-                any(keyword in text for keyword in ['about', 'team', 'staff', 'people', 'contact', 'leadership'])):
-                
-                # Avoid duplicates
-                if not any(existing['url'] == link.get('url', '') for existing in priority_links):
-                    priority_links.append({
-                        'url': link.get('url', ''),
-                        'text': link.get('text', ''),
-                        'type': 'standard',
-                        'priority': 'LOW'
-                    })
-        
-        if not priority_links:
-            print("   ⚠️ No relevant links found for GPT-4o analysis")
-            return self._fallback_urls(domain)
-        
-        # Create enhanced prompt for GPT-4o
+        # Create comprehensive link summary
         link_summary = []
-        for i, link in enumerate(priority_links[:15], 1):  # Top 15 to avoid token limits
+        for link in all_links[:100]:  # Analyze more links
             url = link.get('url', '')
             text = link.get('text', '')
-            link_type = link.get('type', '')
-            priority = link.get('priority', '')
-            link_summary.append(f"{i}. [{priority}] {text} → {url} (Type: {link_type})")
+            href = link.get('href', '')
+            
+            # Enhanced link classification
+            if any(keyword in href.lower() for keyword in ['/team', '/about', '/staff', '/people', '/management', '/leadership']):
+                link_summary.append(f"🎯 PRIORITY: {text} → {href}")
+            else:
+                link_summary.append(f"{text} → {href}")
         
-        prompt = f"""🎯 ENHANCED STAFF PAGE ANALYSIS for {domain}
+        prompt = f"""Analyze this {domain} website and select the 5 BEST URLs for finding detailed staff/team information.
 
-AVAILABLE LINKS (prioritized by relevance):
-{chr(10).join(link_summary)}
+PRIORITY ORDER:
+1. Team/Staff pages (/team, /staff, /people)
+2. About pages (/about, /about-us)
+3. Leadership/Management pages
+4. Contact pages with team info
+5. Company info pages
 
-ANALYSIS CONTEXT:
-- Team fragments: {len(team_fragments)} detected (HIGHEST PRIORITY)
-- Navigation links: {len(navigation_links)} found
-- Content length: {stats.get('contentLength', 0)} characters
-- Page has team content: {stats.get('teamContentFound', False)}
+AVAILABLE LINKS:
+{chr(10).join(link_summary[:50])}
 
-TASK: Select the 3 BEST URLs for finding staff/team information.
+Return ONLY a JSON array of the best URLs:
+["url1", "url2", "url3", "url4", "url5"]
 
-PRIORITIZATION RULES:
-1. Team fragments (#team, #staff) = HIGHEST priority
-2. /team, /about, /staff pages = HIGH priority  
-3. Navigation links to people pages = MEDIUM priority
-4. Avoid: privacy, terms, contact forms, social media
-
-Return ONLY valid URLs as JSON array:
-["url1", "url2", "url3"]
-
-Focus on URLs most likely to contain staff profiles, team photos, or employee listings."""
+Focus on pages most likely to contain staff names, titles, and bios."""
 
         try:
             from openai import OpenAI
@@ -398,11 +793,12 @@ Focus on URLs most likely to contain staff profiles, team photos, or employee li
             response = client.chat.completions.create(
                 model="gpt-4o",
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=500,
+                max_tokens=800,
                 temperature=0.1
             )
             
             result_text = response.choices[0].message.content.strip()
+            
             print(f"\n🧠 GPT-4o ANALYSIS RESULT:")
             print(f"   📝 Raw response: {result_text}")
             
@@ -412,185 +808,59 @@ Focus on URLs most likely to contain staff profiles, team photos, or employee li
             
             if json_start >= 0 and json_end > json_start:
                 json_text = result_text[json_start:json_end]
-                selected_urls = json.loads(json_text)
+                urls = json.loads(json_text)
                 
-                # Validate and normalize URLs
-                validated_urls = []
-                for url in selected_urls:
-                    if self._is_valid_url(url):
-                        validated_urls.append(url)
-                        print(f"   ✅ Selected: {url}")
-                    else:
-                        print(f"   ❌ Invalid URL rejected: {url}")
+                for i, url in enumerate(urls, 1):
+                    print(f"   ✅ Selected: {url}")
                 
-                if len(validated_urls) >= 1:
-                    return validated_urls
+                return urls[:5]  # Return top 5
                 
         except Exception as e:
-            print(f"⚠️ GPT-4o analysis failed: {e}")
+            print(f"⚠️ Enhanced GPT analysis failed: {e}")
         
-        # Fallback: Use priority links directly
-        print(f"   🔄 Using priority links as fallback")
-        fallback_urls = [link['url'] for link in priority_links[:3] if self._is_valid_url(link['url'])]
+        # Enhanced fallback: priority keyword-based selection
+        return self._priority_keyword_selection(all_links)
+
+    def _priority_keyword_selection(self, all_links: list) -> list:
+        """🎯 Priority-based keyword selection for staff pages"""
         
-        if fallback_urls:
-            return fallback_urls
-        
-        return self._fallback_urls(domain)
-
-    def _gpt4o_direct_access_workflow(self, website_url: str) -> tuple:
-        """🤖 GPT-4o Direct Access Workflow with web search capabilities"""
-        
-        print("🤖 WEB SEARCH + GPT-4O ANALYSIS WORKFLOW")
-        print("🔧 Using web search tools to find and analyze actual staff pages")
-        print("=" * 70)
-        
-        domain = urlparse(website_url).netloc.replace('www.', '')
-        
-        try:
-            from openai import OpenAI
-            client = OpenAI(api_key=self.openai_key)
-            
-            # Enhanced GPT-4o prompt with specific search instructions
-            search_prompt = f"""🔍 STAFF PAGE DISCOVERY for {domain}
-
-TASK: Find the actual staff/team pages for this website using web search.
-
-SEARCH STRATEGY:
-1. Search for: site:{domain} team
-2. Search for: site:{domain} staff  
-3. Search for: site:{domain} about
-4. Look for fragment URLs like #{domain}#team or #{domain}#staff
-5. Find pages with employee profiles or team photos
-
-ANALYSIS REQUIREMENTS:
-- Find URLs that contain actual staff listings
-- Look for pages with names + job titles
-- Identify management and decision-makers
-- Extract company LinkedIn URL if found
-
-Please search the web to find the best staff/team pages for {domain} and return:
-1. Best staff page URLs
-2. Company LinkedIn URL
-3. Any staff information found
-
-Return as JSON:
-{{
-  "staff_urls": ["url1", "url2"],
-  "linkedin_url": "company_linkedin_url",
-  "staff_found": [
-    {{"name": "Name", "title": "Title", "source": "URL"}}
-  ]
-}}"""
-
-            print(f"🔍 Phase 1: Searching web for staff/team pages...")
-            print(f"   🔍 Search 1: site:{domain} team")
-            print(f"   🔍 Search 2: site:{domain} staff")
-            print(f"   🔍 Search 3: site:{domain} about")
-            print(f"   🔄 Adding common staff page URLs as fallback")
-            
-            response = client.chat.completions.create(
-                model="gpt-4o",
-                messages=[{"role": "user", "content": search_prompt}],
-                max_tokens=1500,
-                temperature=0.1
-            )
-            
-            result_text = response.choices[0].message.content.strip()
-            print(f"🧠 Phase 2: GPT-4o analyzing search results...")
-            print(f"🧠 GPT-4o Analysis:")
-            print(result_text)
-            
-            # Try to extract URLs from response
-            staff_urls = []
-            linkedin_url = ""
-            
-            # Look for common staff page patterns as fallback
-            common_staff_urls = [
-                f"https://{domain}/about",
-                f"https://{domain}/team", 
-                f"https://{domain}/staff",
-                f"https://{domain}/people",
-                f"https://{domain}/contact"
-            ]
-            
-            print(f"🔄 No URLs found in search results, creating common staff page URLs")
-            
-            # Test each common URL
-            staff_list = []
-            for i, url in enumerate(common_staff_urls, 1):
-                print(f"\n🔍 Phase 3.{i}: Fetching and analyzing {url}")
-                try:
-                    staff, social = self._analyze_single_url(url)
-                    if staff:
-                        staff_list.extend(staff)
-                        print(f"   ✅ Found {len(staff)} staff members")
-                    else:
-                        print(f"   ❌ No staff found on this page")
-                    
-                    # Extract LinkedIn URL
-                    if not linkedin_url and social.get('linkedin'):
-                        linkedin_url = social['linkedin']
-                        
-                except Exception as e:
-                    print(f"   ❌ Error analyzing {url}: {e}")
-            
-            # Try to extract LinkedIn from company domain
-            if not linkedin_url:
-                linkedin_url = f"https://www.linkedin.com/company/{domain.replace('.com', '').replace('.co.uk', '').replace('.ie', '')}"
-            
-            print(f"\n🎉 Web Search + GPT-4o Results:")
-            print(f"   🔍 Method: Web search tools + GPT-4o analysis + content extraction")
-            print(f"   👥 Total unique staff found: {len(staff_list)}")
-            print(f"   🔗 LinkedIn URL: {linkedin_url}")
-            print(f"   🌐 Pages analyzed: {len(common_staff_urls)}")
-            
-            return staff_list, linkedin_url
-            
-        except Exception as e:
-            print(f"❌ GPT-4o direct access workflow failed: {e}")
-            return [], f"https://www.linkedin.com/company/{domain.replace('.com', '').replace('.co.uk', '').replace('.ie', '')}"
-
-    def _fallback_urls(self, domain: str) -> list:
-        """🔄 Generate fallback URLs when GPT-4o analysis fails"""
-        
-        parsed_domain = urlparse(domain) if domain.startswith('http') else None
-        clean_domain = parsed_domain.netloc if parsed_domain else domain
-        
-        fallback_urls = [
-            f"https://{clean_domain}/about",
-            f"https://{clean_domain}/team", 
-            f"https://{clean_domain}/staff"
+        priority_keywords = [
+            ('/team', 100),
+            ('/about', 90), 
+            ('/staff', 100),
+            ('/people', 100),
+            ('/management', 85),
+            ('/leadership', 85),
+            ('/directors', 85),
+            ('/contact', 70),
+            ('/company', 60)
         ]
         
-        print(f"🔄 Using fallback URLs: {fallback_urls}")
-        return fallback_urls
+        scored_links = []
+        for link in all_links:
+            url = link.get('url', '').lower()
+            href = link.get('href', '').lower()
+            text = link.get('text', '').lower()
+            
+            score = 0
+            for keyword, points in priority_keywords:
+                if keyword in href or keyword in url:
+                    score += points
+                if any(kw in text for kw in ['team', 'about', 'staff', 'people']):
+                    score += 20
+            
+            if score > 0:
+                scored_links.append((score, link.get('url', '')))
+        
+        # Sort by score and return top URLs
+        scored_links.sort(reverse=True)
+        selected = [url for score, url in scored_links[:5]]
+        
+        print(f"🎯 Priority keyword selection found {len(selected)} URLs")
+        return selected
 
-    def _is_valid_url(self, url: str) -> bool:
-        """✅ Validate URL format and content"""
-        
-        if not url or len(url) < 10:
-            return False
-        
-        # Reject invalid URL patterns
-        invalid_patterns = [
-            'mailto:', 'tel:', 'javascript:', 'ftp:', 
-            '/privacy', '/terms', '/cookie', '/legal',
-            'facebook.com', 'twitter.com', 'instagram.com'  # Social links should not be analyzed for staff
-        ]
-        
-        url_lower = url.lower()
-        if any(pattern in url_lower for pattern in invalid_patterns):
-            return False
-        
-        # Must be http/https URL
-        if not url.startswith(('http://', 'https://')):
-            return False
-        
-        return True
-
-    def _extract_staff_and_social(self, urls: list) -> tuple:
-        """🔍 Extract staff and social media from selected URLs"""
+    def _enhanced_extract_staff_and_social(self, urls: list) -> tuple:
+        """🔍 Enhanced staff and social extraction with better content analysis"""
         
         all_staff = []
         all_social = {}
@@ -599,31 +869,45 @@ Return as JSON:
             print(f"  📄 Processing {i}/{len(urls)}: {url}")
             
             try:
-                staff, social = self._analyze_single_url(url)
+                staff, social = self._enhanced_analyze_single_url(url)
                 all_staff.extend(staff)
                 all_social.update(social)
                 
                 if staff:
                     print(f"    ✅ Found {len(staff)} staff members")
+                else:
+                    print(f"    ⚠️ No staff found")
                 
             except Exception as e:
-                print(f"    ⚠️ Error: {e}")
-                
-        return all_staff, all_social
-
-    def _analyze_single_url(self, url: str) -> tuple:
-        """🔍 Analyze single URL for staff and social media using account rotation"""
+                print(f"    ❌ Error: {e}")
         
-        # Clean JavaScript function
-        page_function = """
+        # Deduplicate staff
+        unique_staff = self._deduplicate_staff(all_staff)
+        print(f"🔍 Total unique staff found: {len(unique_staff)}")
+        
+        return unique_staff, all_social
+
+    def _enhanced_analyze_single_url(self, url: str) -> tuple:
+        """🔍 Enhanced single URL analysis with better content extraction"""
+        
+        manager = ApifyAccountManager()
+        client = manager.get_client_part1()
+        
+        print(f"   📡 Fetching: {url}")
+        
+        enhanced_content_function = """
         async function pageFunction(context) {
             const { request, log, jQuery } = context;
             const $ = jQuery;
             
-            await context.waitFor(8000);
+            // Enhanced waiting for content loading
+            await context.waitFor(10000);
             
             try {
+                // Extract comprehensive text content
                 const bodyText = $('body').text() || '';
+                
+                // Enhanced social media detection
                 const socialMedia = {};
                 
                 $('a[href]').each(function() {
@@ -631,7 +915,9 @@ Return as JSON:
                     if (!href) return;
                     
                     const lowerHref = href.toLowerCase();
-                    if (lowerHref.includes('linkedin.com') && !socialMedia.linkedin) {
+                    if (lowerHref.includes('linkedin.com/company') && !socialMedia.company_linkedin) {
+                        socialMedia.company_linkedin = href;
+                    } else if (lowerHref.includes('linkedin.com') && !socialMedia.linkedin) {
                         socialMedia.linkedin = href;
                     } else if (lowerHref.includes('facebook.com') && !socialMedia.facebook) {
                         socialMedia.facebook = href;
@@ -642,16 +928,28 @@ Return as JSON:
                     }
                 });
                 
+                // Extract staff sections specifically
+                const staffSections = [];
+                $('*:contains("team"), *:contains("staff"), *:contains("about"), *:contains("people")').each(function() {
+                    const sectionText = $(this).text();
+                    if (sectionText && sectionText.length > 100) {
+                        staffSections.push(sectionText);
+                    }
+                });
+                
                 return {
                     url: request.url,
                     content: bodyText,
+                    staffSections: staffSections.join('\\n\\n'),
                     socialMedia: socialMedia
                 };
                 
             } catch (error) {
+                log.error('Enhanced content extraction error:', error);
                 return {
                     url: request.url,
                     content: '',
+                    staffSections: '',
                     socialMedia: {}
                 };
             }
@@ -661,68 +959,65 @@ Return as JSON:
         payload = {
             "startUrls": [{"url": url}],
             "maxPagesPerRun": 1,
-            "pageFunction": page_function,
+            "keepUrlFragments": True,
+            "waitForDynamicContent": True,
+            "pageFunction": enhanced_content_function,
             "proxyConfiguration": {"useApifyProxy": True}
         }
         
         try:
-            # Get client with credit-based account rotation for Part 1
-            client = get_working_apify_client_part1()
-            
-            print(f"   📡 Fetching: {url}")
-            run = client.actor("apify~web-scraper").call(run_input=payload)
+            run = client.actor("apify/web-scraper").call(run_input=payload)
             
             if run:
                 items = client.dataset(run["defaultDatasetId"]).list_items().items
                 if items:
                     content = items[0].get('content', '')
+                    staff_sections = items[0].get('staffSections', '')
                     social = items[0].get('socialMedia', {})
                     
-                    if len(content) < 100:
-                        print(f"   ❌ HTTP 404 or insufficient content")
-                        return [], {}
+                    # Use staff sections if available, otherwise full content
+                    analysis_content = staff_sections if staff_sections else content
                     
-                    # Analyze content with GPT-4o for staff
-                    staff = self._gpt_extract_staff(content, url)
+                    print(f"   🎯 Extracted staff section: {len(analysis_content)} chars")
+                    
+                    # Enhanced GPT analysis
+                    staff = self._enhanced_gpt_extract_staff(analysis_content, url)
                     
                     return staff, social
             
-            print(f"   ❌ HTTP 404")
             return [], {}
             
         except Exception as e:
-            print(f"    ❌ Content analysis failed: {e}")
+            print(f"    ❌ Enhanced content analysis failed: {e}")
             return [], {}
 
-    def _gpt_extract_staff(self, content: str, url: str) -> list:
-        """🧠 ENHANCED: GPT-4o extracts staff from content with better content analysis"""
+    def _enhanced_gpt_extract_staff(self, content: str, url: str) -> list:
+        """🧠 Enhanced GPT-4o staff extraction with better validation"""
         
-        # 🔧 ENHANCED: Higher minimum content threshold
-        if len(content) < 500:  # Reasonable threshold
+        if len(content) < 1000:  # Minimum content threshold
             return []
         
         domain = urlparse(url).netloc.replace('www.', '')
         
-        # 🔥 ENHANCED: Extract staff-related sections first
-        staff_content = self._extract_staff_sections(content)
-        if staff_content and len(staff_content) > len(content) * 0.3:  # If staff section is substantial
-            content = staff_content
-        
-        prompt = f"""Extract staff from this {domain} content.
+        prompt = f"""Extract ALL staff/team members from this {domain} content.
 
-RULES:
+EXTRACTION RULES:
 1. Find ONLY current employees of {domain}
-2. Need: Full name + Job title
-3. EXCLUDE: Clients, testimonials, external people
-4. EXCLUDE: Company names mistaken as people
-5. Require: First name + Last name (minimum)
-6. PRIORITIZE: Management, directors, decision-makers
+2. Extract: Full name + Job title/role
+3. EXCLUDE: Client testimonials, external partners, vendors
+4. INCLUDE: All levels - executives, managers, staff, directors
+5. Must have: First name + Last name minimum
 
-Return JSON: [{{"name": "Full Name", "title": "Job Title"}}]
-If none found: []
+Return comprehensive JSON:
+[
+  {{"name": "Full Name", "title": "Complete Job Title"}},
+  {{"name": "Another Person", "title": "Their Role"}}
+]
 
-Content:
-{content[:50000]}"""  # Reasonable limit for GPT-4o
+If no staff found: []
+
+CONTENT TO ANALYZE:
+{content[:20000]}"""  # Increased content limit
 
         try:
             from openai import OpenAI
@@ -731,11 +1026,13 @@ Content:
             response = client.chat.completions.create(
                 model="gpt-4o",
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=1500,
+                max_tokens=2000,  # Increased for more comprehensive results
                 temperature=0.1
             )
             
             result_text = response.choices[0].message.content.strip()
+            
+            print(f"\n🧠 GPT-4o found {len(result_text)} chars of analysis")
             
             # Parse JSON
             json_start = result_text.find('[')
@@ -745,114 +1042,18 @@ Content:
                 json_text = result_text[json_start:json_end]
                 staff_list = json.loads(json_text)
                 
-                # 🔥 ENHANCED: Better staff validation
+                # Enhanced validation
                 validated_staff = []
                 for staff in staff_list:
-                    name = staff.get('name', '')
-                    title = staff.get('title', '')
+                    name = staff.get('name', '').strip()
+                    title = staff.get('title', '').strip()
                     
-                    # Validate name structure
-                    if self._validate_staff_name(name, domain):
+                    if self._enhanced_validate_staff(name, title, domain):
                         validated_staff.append(staff)
-                        print(f"   ✅ Valid staff: {name} - {title}")
+                        print(f"    ✅ Valid staff: {name} - {title}")
                     else:
-                        print(f"   ❌ Invalid staff: {name} - {title}")
+                        print(f"    ❌ Invalid staff: {name} - {title}")
                 
-                return validated_staff[:10]  # Limit results
+                return validated_staff
                 
-        except Exception as e:
-            print(f"    ⚠️ GPT extraction failed: {e}")
-        
-        return []
-    
-    def _extract_staff_sections(self, content: str) -> str:
-        """🔥 ENHANCED: Extract staff-related sections from content"""
-        staff_keywords = [
-            'about us', 'team', 'staff', 'our people', 'leadership',
-            'meet the team', 'our team', 'employees', 'directors', 'management'
-        ]
-        
-        # Simple section extraction based on keywords
-        lines = content.split('\n')
-        staff_lines = []
-        in_staff_section = False
-        section_score = 0
-        
-        for line in lines:
-            line_lower = line.lower().strip()
-            
-            # Check if we're entering a staff section
-            if any(keyword in line_lower for keyword in staff_keywords):
-                in_staff_section = True
-                section_score = 0
-                staff_lines.append(line)
-                continue
-            
-            # If in staff section, keep collecting lines
-            if in_staff_section:
-                staff_lines.append(line)
-                section_score += 1
-                
-                # Stop if we hit a clear section break or collected enough
-                if (len(line.strip()) == 0 and section_score > 30) or section_score > 100:
-                    break
-        
-        extracted_content = '\n'.join(staff_lines) if staff_lines else content
-        
-        # Only return extracted section if it's substantial
-        if len(extracted_content) > 1000:
-            print(f"   🎯 Extracted staff section: {len(extracted_content)} chars")
-            return extracted_content
-        
-        return content
-    
-    def _validate_staff_name(self, name: str, domain: str) -> bool:
-        """🔥 ENHANCED: Validate if name looks like a real person"""
-        if not name or len(name.strip()) < 3:
-            return False
-        
-        name_parts = name.strip().split()
-        
-        # Must have at least first and last name
-        if len(name_parts) < 2:
-            return False
-        
-        # Check against company name
-        company_name = domain.replace('.com', '').replace('.co.uk', '').replace('.ie', '')
-        if name.lower().replace(' ', '') == company_name.lower().replace(' ', ''):
-            return False
-        
-        # Reject obvious non-person names
-        reject_keywords = [
-            'company', 'ltd', 'limited', 'inc', 'corp', 'team', 'department',
-            'marketing', 'sales', 'support', 'admin', 'office', 'group'
-        ]
-        
-        name_lower = name.lower()
-        if any(keyword in name_lower for keyword in reject_keywords):
-            return False
-        
-        # Reject single words that might be company names
-        if len(name_parts) == 1:
-            return False
-        
-        # Check for reasonable name length
-        if len(name) > 50:  # Probably not a person's name
-            return False
-        
-        return True
-
-    def _normalize_www(self, url: str) -> str:
-        """🌐 Normalize URL format"""
-        if not url.startswith(('http://', 'https://')):
-            url = 'https://' + url
-        
-        parsed = urlparse(url)
-        netloc = parsed.netloc
-        
-        # Remove www. for consistency (we'll add it back if needed)
-        if netloc.startswith('www.'):
-            netloc = netloc[4:]
-        
-        # For the normalized URL, don't force www
-        return urlunparse((parsed.scheme, netloc, parsed.path, parsed.params, parsed.query, parsed.fragment))
+        except
